@@ -49,16 +49,17 @@ jobs:
         run: |
           mkdir -p scan-evidence
           "$RUNNER_TEMP/pci-bdd/bin/python" -m pip freeze --all > scan-evidence/python-resolved.txt
+          audit_path="$("$RUNNER_TEMP/pci-bdd/bin/python" -c 'import sysconfig; print(sysconfig.get_path("purelib"))')"
           ignore=()
           while IFS= read -r line; do
             case "$line" in ''|'#'*) continue ;; esac
             ignore+=(--ignore-vuln "${line%% *}")
           done < security/python-audit-exceptions.txt
           "$RUNNER_TEMP/pci-audit/bin/pip-audit" \
-            --disable-pip --requirement scan-evidence/python-resolved.txt \
+            --path "$audit_path" \
             --format json --output scan-evidence/python-audit.json "${ignore[@]}" || status=$?
           "$RUNNER_TEMP/pci-audit/bin/pip-audit" \
-            --disable-pip --requirement scan-evidence/python-resolved.txt "${ignore[@]}" || true
+            --path "$audit_path" "${ignore[@]}" || true
           exit "${status:-0}"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -86,7 +87,7 @@ jobs:
       - run: bash generate.sh
       - name: govulncheck
         run: |
-          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+          go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
           "$(go env GOPATH)/bin/govulncheck" -tags=generated ./...
 
   secrets:
