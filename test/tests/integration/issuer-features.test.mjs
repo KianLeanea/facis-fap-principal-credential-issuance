@@ -42,6 +42,9 @@ test('connector editing distinguishes absent scope, empty scope and explicit all
   assert.deepEqual(ui.connectorForm.value.configurationIds, []);
   ui.editConnector({ id: 'two', draft: { name: 'All', configurationIds: null } });
   assert.equal(ui.connectorForm.value.configurationIds, null);
+  const original = { id: 'three', draft: { configurationIds: ['A'] } };
+  ui.editConnector(original); ui.connectorForm.value.configurationIds.push('B');
+  assert.deepEqual(original.draft.configurationIds, ['A']);
 });
 
 test('flow actions enforce reordering bounds and add steps before the offer', () => {
