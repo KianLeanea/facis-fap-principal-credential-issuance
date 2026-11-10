@@ -126,6 +126,7 @@ function uiUrl(host, basePath = "") {
 
 // ---- src/config/runtime.js ----
 
+
 function inferBasePathFromUiLocation(pathname) {
   const value = String(pathname || "");
   const match = /^(.*)\/ui(?:\/.*)?$/.exec(value);
@@ -181,6 +182,7 @@ async function sha256UrlSafe(value) {
 
 // ---- src/state/store.js ----
 
+
 const store = reactive({
   session: null,
   step: null,
@@ -198,6 +200,7 @@ const store = reactive({
 
 
 // ---- src/state/reducers.js ----
+
 
 function normalizeUiError(error) {
   return { category: error?.category || (error?.status >= 502 ? 'integration' : 'system'),
@@ -249,6 +252,7 @@ function reduceUiMessage(envelope, pending) {
 
 
 // ---- src/services/transport.js ----
+
 
 
 
@@ -362,6 +366,7 @@ const bridgePing = () => sendCommand('', {}, 'ping');
 
 // ---- src/components/feedback.js ----
 
+
 const UiFeedback = {
   props:['error'], emits:['dismiss','recover'],
   template:`<div v-if="error" class="error persistent-error" role="alert">
@@ -390,6 +395,8 @@ const UiField = {
 
 
 // ---- src/services/api.js ----
+
+
 
 
 
@@ -436,6 +443,7 @@ const api = {
 
 
 // ---- src/services/auth.js ----
+
 
 
 
@@ -493,6 +501,7 @@ const PCI_QR_ALIGNMENT=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42
 
 
 // ---- src/qr.js ----
+
 
 // QR byte-mode encoder, error correction L, versions 1–40. No network or
 // browser storage. Tables and placement conventions credit in vendor notice.
@@ -725,6 +734,7 @@ const Sr2Console = {
 
 
 // ---- src/main.js ----
+
 
 
 
