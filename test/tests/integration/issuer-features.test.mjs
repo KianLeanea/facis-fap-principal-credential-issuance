@@ -115,6 +115,16 @@ test('wallet return navigation takes priority over a previously saved workspace 
   assert.equal(window.location.hash, '#/presentation');
 });
 
+test('refresh clears privileged workspace state when issuer privileges are removed', async () => {
+  const { ui } = issuerControllerFixture();
+  ui.configs.value = [{ id: 'old-configuration' }]; ui.flows.value = [{ id: 'old-flow' }];
+  ui.assets.value = [{ id: 'old-asset' }]; ui.assignments.value = [{ id: 'old-assignment' }];
+  ui.members.value = [{ subject: 'old-member' }]; ui.identityForm.value.clientSecret = 'synthetic-test-value';
+  await ui.refresh();
+  for (const name of ['configs', 'flows', 'assets', 'assignments', 'members']) assert.deepEqual(ui[name].value, [], name);
+  assert.equal(ui.identityForm.value.clientSecret, '');
+});
+
 test('successful operations and navigation do not silently dismiss existing errors', async () => {
   const { ui } = issuerControllerFixture();
   ui.error.value = { message: 'Existing error' };
