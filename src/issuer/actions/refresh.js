@@ -45,6 +45,14 @@ export function createPciRefreshActions(state, dependencies) {
         configs.value = (await call('/credential-configurations')).items;
         flows.value = (await call('/flows')).items;
         assets.value = (await call('/assets')).items;
+      } else {
+        configs.value = [];
+        flows.value = [];
+        assets.value = [];
+        selected.value = null;
+        configForm.value = null;
+        selectedFlow.value = null;
+        flowForm.value = null;
       }
       if (cap.value.tenantAdmin) {
         await loadIdentity();
@@ -69,6 +77,16 @@ export function createPciRefreshActions(state, dependencies) {
         settings.value = (await call('/issuer-settings')).item;
         if (settings.value) settingsForm.value = clone(settings.value.draft);
         publication.value = await call('/publication');
+      } else {
+        members.value = [];
+        assignments.value = [];
+        identity.value = null;
+        identityForm.value.clientSecret = '';
+        metadata.value = null;
+        branding.value = null;
+        settings.value = null;
+        publication.value = null;
+        connector.value = null;
       }
       await restoreJourney();
     });
