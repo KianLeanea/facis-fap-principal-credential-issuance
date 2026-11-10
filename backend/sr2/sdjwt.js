@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { sr2Assert, sr2Hash, sr2Claims, sr2Text, sr2ExpectedClaims } from './domain.js';
-import { sr2VerifyJwt } from './adapters.js';
+import { sr2VerifyJwt } from './adapter-contracts.js';
 // Only formatting happens here. Every issuer signature is produced by TSA.
 export function pciSdJwtPayload(payload, claims, definitions) {
   const disclosures = [],

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { sr2Assert, sr2Fail, sr2Uuid } from './domain.js';
-import { sr2Deadline } from './adapters.js';
+import { sr2Deadline } from './adapter-contracts.js';
 // An authorized revocation intent is durable. A short lease prevents parallel
 // retries, while native readback resolves a lost acknowledgement after restart.
 export function extendSr2Revocation(api, pinned) {

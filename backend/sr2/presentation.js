@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { sr2Assert, sr2Fail, sr2Object, sr2Uuid, sr2Text, sr2Hash } from './domain.js';
 import { sr2HolderDid } from './history.js';
-import { sr2Deadline } from './adapters.js';
+import { sr2Deadline } from './adapter-contracts.js';
 function pciPresentationJwt(value) {
   sr2Assert(typeof value === 'string' && value.length <= 131072, 'A compact JWT presentation is required.');
   const parts = value.split('.');
