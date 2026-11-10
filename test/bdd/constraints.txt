@@ -1,9 +1,4 @@
 # Version constraints for the BDD Executor dependency set.
-#
-# markdown: transitive dependency of licensecheck (itself required by the
-# mandated XFSC bdd-executor). Version 3.11.2 has no licence data at
-# ClearlyDefined, so the Eclipse Dash licence check reports it as unresolved
-# although the package is BSD-3-Clause. This pins a version with vetted
-# licence data until the Eclipse IP review of 3.11.2 is approved; the pin is
-# then removed. Verify with the Eclipse Dash tool before changing the version.
-markdown==3.8
+# Markdown 3.8.1 includes the parser-crash fix for PYSEC-2026-89.
+# Eclipse Dash/IP clearance must be verified for this exact version.
+markdown==3.8.1
