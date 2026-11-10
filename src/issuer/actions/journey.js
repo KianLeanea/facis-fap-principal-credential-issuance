@@ -11,7 +11,7 @@ export function createPciJourneyActions(state, dependencies) {
       return null;
     }
   })();
-  if (recovery?.tab) tab.value = recovery.tab;
+  if (recovery?.tab && tab.value !== 'presentation') tab.value = recovery.tab;
   let requestToRestore = /^[a-f0-9-]{36}$/i.test(recovery?.requestId || '') ? recovery.requestId: null;
   function rememberWorkspace() {
     requestToRestore = journey.value?.request?.requestId || null;
