@@ -1460,9 +1460,10 @@ function createPciConnectorActions(state, dependencies) {
   }
   function editConnector(c) {
     connector.value = c;
+    const draft = clone(c.draft);
     connectorForm.value = {
-      ...clone(c.draft),
-      configurationIds: c.draft.configurationIds ?? (Object.hasOwn(c.draft, 'configurationIds') ? null: [])
+      ...draft,
+      configurationIds: Object.hasOwn(draft, 'configurationIds') ? draft.configurationIds: []
     };
   }
   return { saveConnector, newConnector, editConnector };
