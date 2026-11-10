@@ -13,7 +13,9 @@
     "test:integration": "node --test test/tests/integration/*.test.mjs",
     "test:ci": "npm run build && npm run test:static && npm run test:bdd && npm run test:integration",
     "security:audit": "npm audit --omit=dev --audit-level=high",
-    "test:offline": "node tools/validate-offline.mjs"
+    "test:offline": "node tools/validate-offline.mjs",
+    "format:check": "node tools/format-source.mjs --check backend src shared tools build.js",
+    "format": "node tools/format-source.mjs backend src shared tools build.js"
   },
   "dependencies": {
     "jsonwebtoken": "9.0.2",

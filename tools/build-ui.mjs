@@ -2,7 +2,6 @@ import { stripModuleSyntax } from "./lib/module-source.mjs";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
-
 const root = process.cwd();
 const outDir = path.join(root, ".build", "ui");
 const releaseVersion = (await readFile(path.join(root, "VERSION"), "utf8")).trim();
@@ -33,10 +32,10 @@ await copyFile(path.join(root, "src", "styles.css"), path.join(outDir, "index.cs
 // FACIS project SVG from eclipse-xfsc/facis-fap-iot-ai:
 // services/ai-insight-ui/ui/app/public/facis-logo.svg (Git blob 9a785cfda459f938b140d394b44bcd79fd56297a).
 await copyFile(path.join(root, "src", "assets", "facis-logo.svg"), path.join(outDir, "facis-logo.svg"));
-const vue = await readFile(path.join(root,'vendor','vue.global.prod.js'));
-const provenance = JSON.parse(await readFile(path.join(root,'vendor','vue-provenance.json'),'utf8'));
+const vue = await readFile(path.join(root, 'vendor', 'vue.global.prod.js'));
+const provenance = JSON.parse(await readFile(path.join(root, 'vendor', 'vue-provenance.json'), 'utf8'));
 if (createHash('sha256').update(vue).digest('hex') !== provenance.sha256) throw new Error('Vendored Vue digest mismatch');
-await writeFile(path.join(outDir,'vue.global.prod.js'),vue);
+await writeFile(path.join(outDir, 'vue.global.prod.js'), vue);
 console.log(`[build-ui] wrote canonical UI assets to ${outDir}`);
-
-await writeFile(path.join(outDir,'THIRD_PARTY_LICENSES.txt'),(await readFile(path.join(root,'vendor','vue-LICENSE.txt'),'utf8'))+'\n'+(await readFile(path.join(root,'vendor','qr-tables-LICENSE.txt'),'utf8')));
+await writeFile(path.join(outDir, 'THIRD_PARTY_LICENSES.txt'), (await readFile(path.join(root, 'vendor', 'vue-LICENSE.txt'), 'utf8')) +
+  '\n' + (await readFile(path.join(root, 'vendor', 'qr-tables-LICENSE.txt'), 'utf8')));
