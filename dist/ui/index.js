@@ -3119,11 +3119,13 @@ const App = {
     }
     const stopReconnect = onBridgeReconnect(recoverWorkspace);
     onUnmounted(stopReconnect);
+    function handleHashRoute() {
+      hashRoute.value = window.location.hash || "#/register";
+      if (hashRoute.value.startsWith("#/provider") && !isTenantHost.value) void loadProvider();
+    }
+    onUnmounted(() => window.removeEventListener("hashchange", handleHashRoute));
     onMounted(async() => {
-      window.addEventListener("hashchange", () => {
-        hashRoute.value = window.location.hash || "#/register";
-        if (hashRoute.value.startsWith("#/provider") && !isTenantHost.value) void loadProvider();
-      });
+      window.addEventListener("hashchange", handleHashRoute);
       try {
         config.value = await api.registrationConfig();
         applyPublicConfiguration(config.value);
