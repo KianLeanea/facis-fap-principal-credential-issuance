@@ -14,7 +14,7 @@ const expected = [
 ];
 assert.deepEqual(requirements.items.map(r => r.id), expected);
 for (const row of requirements.items) {
-  assert.ok(['DONE', 'PARTIAL', 'GAP'].includes(row.status), row.id);
+  assert.ok(['NOT_REASSESSED_FOR_ACCEPTANCE', 'PARTIAL', 'GAP', 'EVIDENCE_LINKED'].includes(row.status), row.id);
   for (const field of ['implementation', 'checks']) for (const file of row[field].split(';').map(s => s.trim()).filter(s => s.includes(
     '/') &&
   !s.includes(' '))) assert.ok(fs.existsSync(file), row.id + ': ' + file);
@@ -24,7 +24,7 @@ assert.equal(technical.version, version);
 assert.deepEqual(technical.items.map(r => r.id), Array.from({ length: 83 }, (_, i) => 'TDC-' + String(i + 1).padStart(3, '0')));
 for (const row of technical.items) {
   assert.ok(row.source.page >= 2 && row.source.page <= 7 && row.source.section && row.closure, row.id);
-  assert.ok(['DONE', 'EXCLUDED', 'BLOCKED_OWNER'].includes(row.development), row.id);
+  assert.ok(['SOURCE_REFERENCED', 'PROCESS_REVIEW_REQUIRED', 'OWNER_REVIEW_REQUIRED'].includes(row.development), row.id);
   for (const file of row.implementation) assert.ok(fs.existsSync(file), row.id + ': ' + file);
 }
 const spec = read('docs/specifications/manifest.json');

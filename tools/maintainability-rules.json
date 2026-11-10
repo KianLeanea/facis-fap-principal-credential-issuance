@@ -18,23 +18,6 @@
     "functionComplexity": 20,
     "compositionFactoryPrefix": "createPci"
   },
-  "exceptions": [
-    {
-      "file": "tools/build-requirement-audit.mjs",
-      "rules": [
-        "line-length"
-      ],
-      "reason": "Generated-documentation text of the submitted baseline; rewritten with the requirements documentation in R2-8, which removes this entry.",
-      "issue": "R2-8"
-    },
-    {
-      "file": "tools/build-requirements.mjs",
-      "rules": [
-        "line-length"
-      ],
-      "reason": "Generated-documentation text of the submitted baseline; rewritten with the requirements documentation in R2-8, which removes this entry.",
-      "issue": "R2-8"
-    }
-  ],
+  "exceptions": [],
   "sqlLiterals": "string and template literals that contain an SQL statement are exempt from lineLength"
 }
