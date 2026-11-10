@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { issuerControllerFixture } from '../../support/issuer-controller.mjs';
+import { issuerControllerFixture, deferred } from '../../support/issuer-controller.mjs';
 
 const requestId = 'd616ebf2-2874-426c-83f1-2f9aa0be45ee';
 
@@ -93,6 +93,15 @@ test('workspace persistence keeps only opaque request IDs and the active tab', (
   ui.offer.value = { offerUrl: 'https://wallet.example/offer' };
   ui.navigate('request');
   assert.deepEqual(JSON.parse([...saved.values()][0]), { tab: 'request', requestId });
+});
+
+test('overlapping issuer operations keep busy until the final operation settles', async () => {
+  const first = deferred(), second = deferred(); let sequence = 0;
+  const { ui } = issuerControllerFixture({ request: () => (++sequence === 1 ? first : second).promise });
+  const a = ui.createKey(), b = ui.createKey();
+  assert.equal(ui.busy.value, true);
+  first.resolve({}); await a; assert.equal(ui.busy.value, true);
+  second.resolve({}); await b; assert.equal(ui.busy.value, false);
 });
 
 test('successful operations and navigation do not silently dismiss existing errors', async () => {
