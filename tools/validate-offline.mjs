@@ -18,6 +18,7 @@ function files(dir) {
 function manifest() {
   return Object.fromEntries(files('dist').map(f => [f, hash(fs.readFileSync(f))]));
 }
+const maintainability = JSON.parse(run(process.execPath, ['tools/check-maintainability.mjs']).trim());
 run(process.execPath, ['build.js']);
 const documentation = JSON.parse(run(process.execPath, ['tools/check-documentation.mjs']).trim());
 const suites = ['static', 'bdd', 'integration'].flatMap(dir => files('test/tests/' + dir).filter(f => f.endsWith('.test.mjs')));
@@ -30,6 +31,8 @@ for (const f of [
 ]) run('bash', ['-n', f]);
 const g0Report = JSON.parse(run('python3', ['tools/check-g0-manifests.py']).trim());
 const bddCatalogue = JSON.parse(run('python3', ['tools/check-bdd-catalogue.py']).trim());
+run('python3', ['-B', '-m', 'unittest', 'discover', '-s', 'test/ux-runner', '-p', 'test_*.py']);
+const uxSummaryGuard = 'PASS (unit tests only; deployed UX execution NOT_RUN)';
 const pythonSyntax = JSON.parse(run('python3', [
   '-c',
   `import ast,json
@@ -64,9 +67,17 @@ const summary = {
   failed: Number(output.match(/^# fail (\d+)$/m)?.[1]),
   skipped: Number(output.match(/^# skipped (\d+)$/m)?.[1]),
   deterministic: true,
+  maintainability: {
+    status: maintainability.status,
+    files: maintainability.files,
+    maximumLineLength: maintainability.maximumLineLength,
+    uiGraph: maintainability.uiGraph.status,
+    backendGraph: maintainability.backendGraph.status
+  },
   g0Yaml: g0Report,
   documentation,
   bddCatalogue,
+  uxSummaryGuard,
   pythonSyntax,
   shellSyntax: 'PASS',
   secretLiteralScan: 'PASS',
@@ -75,7 +86,7 @@ const summary = {
     'PostgreSQL server migration/concurrency',
     'Go/Goa/protobuf compile and race tests',
     'Helm lint/template and Kubernetes/ArgoCD admission',
-    'XFSC BDD Executor, Chromium browser and accessibility',
+    'Full XFSC BDD Executor, browser HTTP navigation and deployed accessibility acceptance (DOM fixtures reported separately)',
     'Real ORCE/Keycloak/Entra/OCM/NATS/participant/PCM deployments',
     'MkDocs build and semantic JSON-LD/SHACL engine validation',
     'npm install/audit and official Eclipse workflows'
