@@ -107,6 +107,14 @@ test('overlapping issuer operations keep busy until the final operation settles'
   second.resolve({}); await b; assert.equal(ui.busy.value, false);
 });
 
+test('wallet return navigation takes priority over a previously saved workspace tab', () => {
+  const saved = new Map([['fap-pci-workspace:alpha:member', JSON.stringify({ tab: 'configurations', requestId: null })]]);
+  const { ui, window } = issuerControllerFixture({ saved, hash: '#/presentation?request=' + requestId + '&response_code=' + 'a'.repeat(43) });
+  assert.equal(ui.tab.value, 'presentation');
+  assert.equal(ui.presentation.value.requestId, requestId);
+  assert.equal(window.location.hash, '#/presentation');
+});
+
 test('successful operations and navigation do not silently dismiss existing errors', async () => {
   const { ui } = issuerControllerFixture();
   ui.error.value = { message: 'Existing error' };
