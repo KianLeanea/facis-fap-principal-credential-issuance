@@ -1,4 +1,6 @@
-import { stripModuleSyntax } from "./lib/module-source.mjs";
+import { inspectBundleGraph, pciNativeRuntimeBindings } from './lib/bundle-graph.mjs';
+import { PCI_SR2_MODULES } from './lib/bundle-inputs.mjs';
+import { stripModuleSyntax } from './lib/module-source.mjs';
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -12,33 +14,9 @@ const commonBase = (await readFile(path.join(root, "backend", "functions", "_com
   releaseVersion);
 const common = commonBase + '\n' + await readFile(path.join(root, 'backend/functions/_identity.js'), 'utf8') + '\n' + await readFile(path
   .join(root, 'backend/functions/_bridge.js'), 'utf8');
-const sr2Files = [
-  'domain.js',
-  'journey-input.js',
-  'assets.js',
-  'participant-security.js',
-  'store.js',
-  'adapter-contracts.js',
-  'native-keys.js',
-  'linked-data.js',
-  'native-metadata.js',
-  'sdjwt.js',
-  'wire.js',
-  'native.js',
-  'adapters.js',
-  'transport.js',
-  'profiles.js',
-  'history.js',
-  'semantics.js',
-  'service-policy.js',
-  'service.js',
-  'revocation.js',
-  'issuance.js',
-  'presentation.js',
-  'maintenance.js',
-  'runtime.js',
-  'http.js'
-];
+const sr2Files = PCI_SR2_MODULES;
+const graph = inspectBundleGraph(sr2Files.map(file => 'backend/sr2/' + file), { externals: pciNativeRuntimeBindings });
+if (graph.errors.length) throw new Error(graph.errors.join('\n'));
 let sr2Source = (await Promise.all(sr2Files.map(async file => stripModuleSyntax(await readFile(path.join(root, 'backend', 'sr2', file),
   'utf8'), file)))).join('\n');
 sr2Source = sr2Source.replaceAll('__PCI_SR2_BUILD_ID__', createHash('sha256').update(sr2Source).digest('hex'));
@@ -297,7 +275,8 @@ const moduleSpecs = [
     file: "M4_PCI-TenantReconciliation_flow.json",
     functionFile: "reconcile.js",
     includeK8s: true,
-    info: "ORCE in-cluster ServiceAccount desired-state reconciliation for Keycloak tenant identity, ConfigMaps, exact tenant subdomain HTTPRoutes, DNS readiness, and compatibility provisioner endpoints.",
+    info: ("ORCE in-cluster ServiceAccount desired-state reconciliation for Keycloak tenant identity, ConfigMaps, " +
+      "exact tenant subdomain HTTPRoutes, DNS readiness, and compatibility provisioner endpoints."),
     requirements: ["FR-PCI-03", "FR-PCI-26", "FR-PCI-50", "FR-PCI-67", "FR-PCI-69", "FR-PCI-70"],
     routes: [
       [
@@ -396,8 +375,10 @@ async function buildModule(spec) {
   const inNode = linkIn(z, `${spec.key}:uib-in`, `${spec.route}-in`, 120, 130, [id(`link-out:base:${spec.route}`)]);
   const fnNode = functionNode(z, spec.key, spec.label, moduleSource, 920, 300, spec.includeK8s);
   const outNode = linkOut(z, `${spec.key}:uib-out`, "→ uibuilder response", 1380, 500, [id("link-in:base:response")]);
-  if (spec.key === 'issuer-runtime') fnNode.finalize =
-    'const states=pg.Pool[Symbol.for("xfsc.fap-pci.process-state.v1")];for(const state of states?.values() || []){const pool=state.poolHolder?.pool;if(pool?.pciNative){pool.pciNative.service?.clearJourneyInputs?.();pool.pciNative.nats.close();delete pool.pciNative;}}';
+  if (spec.key === 'issuer-runtime') fnNode.finalize = (
+    "const states=pg.Pool[Symbol.for(\"xfsc.fap-pci.process-state.v1\")];for(const state of states?.values() || " + "[]){const " +
+    "pool=state.poolHolder?.pool;if(pool?.pciNative){pool.pciNative.service?.clearJourneyInputs?.();pool.pciNative.nats.close();delete " +
+    "pool.pciNative;}}");
   const response = httpResponse(z, spec.key, 1390, 240);
   nodes.push(inNode, fnNode, outNode, response);
   inNode.wires[0] = [fnNode.id];
@@ -429,8 +410,10 @@ async function buildBase() {
   const statusSource = `const PCI_OPENAPI_DOCUMENT = ${JSON.stringify(openapiDocument)};\n${await readFile(path.join(root, "backend", "functions", "status.js"), "utf8")}`;
   const nodes = [
     tab("base", "PCI_Interface", "Shared uibuilder interface plus public health, readiness, metrics and OpenAPI routes."),
-    comment(z, "base", "══ FAP PCI uibuilder interface ══",
-      "The uibuilder node remains Node-RED-relative at ui. Externally it is served at {PCI_ORCE_BASE_PATH}/ui/. HTTP In routes likewise remain relative to Node-RED httpNodeRoot; public URL generation uses PCI_ORCE_BASE_PATH without changing the route contract.")
+    comment(z, "base", "══ FAP PCI uibuilder interface ══", (
+      "The uibuilder node remains Node-RED-relative at ui. Externally it is served at {PCI_ORCE_BASE_PATH}/ui/. " +
+      "HTTP In routes likewise remain relative to Node-RED httpNodeRoot; public URL generation uses " +
+      "PCI_ORCE_BASE_PATH without changing the route contract."))
   ];
   const ui = {
     id: id("uibuilder:ui"),

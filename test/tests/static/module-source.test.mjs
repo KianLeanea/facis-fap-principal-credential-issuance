@@ -38,7 +38,7 @@ test('formatting preserves ASI-sensitive return semantics, comments, strings and
 });
 
 test('source formatting is idempotent for representative runtime and UI modules', () => {
-  for(const file of ['backend/sr2/domain.js','backend/sr2/service.js','src/sr2.js']) {
+  for(const file of ['backend/sr2/domain.js','backend/sr2/service-policy.js','src/sr2.js']) {
     const formatted=formatSource(fs.readFileSync(file,'utf8'));
     assert.equal(formatSource(formatted),formatted,file);
   }

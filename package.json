@@ -15,7 +15,8 @@
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "test:offline": "node tools/validate-offline.mjs",
     "format:check": "node tools/format-source.mjs --check backend src shared tools build.js",
-    "format": "node tools/format-source.mjs backend src shared tools build.js"
+    "format": "node tools/format-source.mjs backend src shared tools build.js",
+    "check:maintainability": "node tools/check-maintainability.mjs"
   },
   "dependencies": {
     "jsonwebtoken": "9.0.2",
