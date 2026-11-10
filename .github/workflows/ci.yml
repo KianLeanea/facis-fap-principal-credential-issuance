@@ -16,6 +16,7 @@ jobs:
         with: {node-version: '24', cache: npm}
       - run: npm ci --no-audit --no-fund
       - run: npm run format:check
+      - run: npm run check:headers
       - run: node tools/check-maintainability.mjs --output maintainability.json
       - name: Preserve maintainability diagnostics
         if: always()

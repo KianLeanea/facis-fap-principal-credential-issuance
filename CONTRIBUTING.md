@@ -40,7 +40,10 @@ workflows; see the [test strategy](docs/testing/test-strategy.md) and
 - Tenant-owned repository methods must require tenant identity; never use an unscoped
   object lookup for tenant-owned state.
 - Source files carry the copyright statement and `SPDX-License-Identifier: Apache-2.0`;
-  third-party files keep their own notices.
+  `node tools/add-licence-headers.mjs` adds the header to a new file and `npm run
+  check:headers` fails CI on a file without one. A file largely prepared with
+  AI-assisted tools is listed in `tools/licence-header-ai-files.txt` and carries the
+  disclosure in its header. Third-party files keep their own notices.
 - Authored JavaScript passes `npm run format:check` and `npm run check:maintainability`;
   a new exception in `tools/maintainability-rules.json` names its reason and the issue
   that removes it.

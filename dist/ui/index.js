@@ -3,6 +3,16 @@
 "use strict";
 const { createApp, computed, onMounted, onUnmounted, ref, reactive } = Vue;
 // ---- shared/public-url.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /**
  * Canonical public URL/base-path helpers shared by the browser bundle and the
  * generated ORCE Function nodes.
@@ -113,6 +123,16 @@ function uiUrl(host, basePath = "") {
 
 
 // ---- src/config/runtime.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 function inferBasePathFromUiLocation(pathname) {
   const value = String(pathname || "");
@@ -144,6 +164,16 @@ function applyPublicConfiguration(configuration) {
 
 
 // ---- src/utils/pkce.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 function base64Url(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -158,6 +188,16 @@ async function sha256UrlSafe(value) {
 
 
 // ---- src/state/store.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 const store = reactive({
   session: null,
@@ -188,6 +228,16 @@ const store = reactive({
 
 
 // ---- src/state/reducers.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 function normalizeUiError(error) {
   return {
@@ -263,6 +313,16 @@ function reduceUiMessage(envelope, pending) {
 
 
 // ---- src/services/transport.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -422,6 +482,16 @@ const bridgePing = () => sendCommand('', {}, 'ping');
 
 
 // ---- src/components/feedback.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 const UiFeedback = {
   props: ['error'],
@@ -509,6 +579,16 @@ const UiField = {
 
 
 // ---- src/services/api.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -554,6 +634,16 @@ const api = {
 
 
 // ---- src/services/auth.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -874,6 +964,16 @@ function pciQrImage(text) {
 
 
 // ---- src/issuer/client.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Tenant selection is evaluated per call, so switching tenants cannot retain a
 // stale URL. The existing request transport owns authentication and base paths.
 function createPciIssuerClient(request, tenantId) {
@@ -892,6 +992,16 @@ function createPciIssuerClient(request, tenantId) {
 
 
 // ---- src/issuer/form-defaults.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Pure factories return fresh nested state for each editing session.
 function newPciConnectorForm() {
   return {
@@ -938,6 +1048,16 @@ function newPciConfigurationForm() {
 
 
 // ---- src/issuer/workspace-state.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 /** Per-component state. Secret inputs stay in memory and are not persisted here. */
 function createPciIssuerState({ ref, props, runtime, window }) {
@@ -1086,6 +1206,16 @@ function createPciIssuerState({ ref, props, runtime, window }) {
 
 
 // ---- src/issuer/workspace-selectors.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Pure reactive projections of issuer state; no requests or persistence. */
 const pciTenantSettingsTabs = [
   { "id": "branding", "label": "Branding" },
@@ -1205,6 +1335,16 @@ function createPciIssuerSelectors(state, { computed, pciQrImage }) {
 
 
 // ---- src/issuer/actions/identity.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Identity operations with explicit state and I/O dependencies. */
 function createPciIdentityActions(state, dependencies) {
   const { identity, identityRedirect, identityForm, notice, keyName, keyType } = state;
@@ -1240,6 +1380,16 @@ function createPciIdentityActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/configurations.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 /** Configurations operations with explicit state and I/O dependencies. */
 function createPciConfigurationActions(state, dependencies) {
@@ -1313,6 +1463,16 @@ function createPciConfigurationActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/flows.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Flows operations with explicit state and I/O dependencies. */
 function createPciFlowActions(state, dependencies) {
   const { selectedFlow, flowForm, selected, configs, versions, flows, notice, restoreVersion, preview } = state;
@@ -1398,6 +1558,16 @@ function createPciFlowActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/tenant.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Tenant operations with explicit state and I/O dependencies. */
 function createPciTenantActions(state, dependencies) {
   const { metadata, branding, settings, notice, metadataForm, authServers, publication } = state;
@@ -1439,6 +1609,16 @@ function createPciTenantActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/connectors.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 /** Connectors operations with explicit state and I/O dependencies. */
 function createPciConnectorActions(state, dependencies) {
@@ -1471,6 +1651,16 @@ function createPciConnectorActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/access.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Access operations with explicit state and I/O dependencies. */
 function createPciAccessActions(state, dependencies) {
   const { grant, grantConfig, assignments, notice } = state;
@@ -1496,6 +1686,16 @@ function createPciAccessActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/assets.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Assets operations with explicit state and I/O dependencies. */
 function createPciAssetActions(state, dependencies) {
   const { uploadScope, selected, assets, configForm, uploadRole, brandingForm, notice } = state;
@@ -1531,6 +1731,16 @@ function createPciAssetActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/history.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** History operations with explicit state and I/O dependencies. */
 function createPciHistoryActions(state, dependencies) {
   const { historyConfig, search, history, nextCursor, notice } = state;
@@ -1558,6 +1768,16 @@ function createPciHistoryActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/presentation.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Presentation operations with explicit state and I/O dependencies. */
 function createPciPresentationActions(state, dependencies) {
   const {
@@ -1597,6 +1817,16 @@ function createPciPresentationActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/journey.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Journey operations with explicit state and I/O dependencies. */
 function createPciJourneyActions(state, dependencies) {
   const { journey, tab, offer, notice, answers, consent } = state;
@@ -1688,6 +1918,16 @@ function createPciJourneyActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/refresh.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Refresh operations with explicit state and I/O dependencies. */
 function createPciRefreshActions(state, dependencies) {
   const {
@@ -1792,6 +2032,16 @@ function createPciRefreshActions(state, dependencies) {
 
 
 // ---- src/issuer/operation-runner.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 /** Keep UI progress accurate across overlapping operations and nested refreshes. */
 function createPciOperationRunner(state, normalizeError, recoverInput) {
   let pending = 0;
@@ -1819,6 +2069,16 @@ function createPciOperationRunner(state, normalizeError, recoverInput) {
 
 
 // ---- src/issuer/controller.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -1882,6 +2142,16 @@ function createPciIssuerController(props, dependencies) {
 
 
 // ---- src/issuer/views/presentation-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Presentation panel view. Actions are supplied by the issuer controller.
 const pciPresentationPanelTemplate = `
 <section v-if="tab==='presentation'" class="card">
@@ -1933,6 +2203,16 @@ const pciPresentationPanelTemplate = `
 
 
 // ---- src/issuer/views/request-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Request panel view. Actions are supplied by the issuer controller.
 const pciRequestPanelTemplate = `
 <div v-if="tab==='request'" class="card request-card">
@@ -2002,6 +2282,16 @@ const pciRequestPanelTemplate = `
 
 
 // ---- src/issuer/views/configurations-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Configurations panel view. Actions are supplied by the issuer controller.
 const pciConfigurationsPanelTemplate = `
 <section v-if="tab==='configurations' && cap.issuer" class="configuration-workspace">
@@ -2291,6 +2581,16 @@ const pciConfigurationsPanelTemplate = `
 
 
 // ---- src/issuer/views/journeys-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Journeys panel view. Actions are supplied by the issuer controller.
 const pciJourneysPanelTemplate = `
 <section class="card" v-if="tab==='journeys' && cap.issuer">
@@ -2383,6 +2683,16 @@ const pciJourneysPanelTemplate = `
 
 
 // ---- src/issuer/views/history-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // History panel view. Actions are supplied by the issuer controller.
 const pciHistoryPanelTemplate = `
 <section class="card" v-if="tab==='history' && cap.issuer">
@@ -2492,6 +2802,16 @@ const pciHistoryPanelTemplate = `
 
 
 // ---- src/issuer/views/tenant-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Tenant panel view. Actions are supplied by the issuer controller.
 const pciTenantPanelTemplate = `
 <section v-if="tab==='tenant' && cap.tenantAdmin" class="tenant-settings">
@@ -2683,6 +3003,16 @@ const pciTenantPanelTemplate = `
 
 
 // ---- src/issuer/views/connectors-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Connectors panel view. Actions are supplied by the issuer controller.
 const pciConnectorsPanelTemplate = `
 <section class="card" v-if="tab==='connectors' && cap.tenantAdmin">
@@ -2783,6 +3113,16 @@ const pciConnectorsPanelTemplate = `
 
 
 // ---- src/issuer/views/delegation-slot.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Delegation slot view. Actions are supplied by the issuer controller.
 const pciDelegationSlotTemplate = `
 <slot v-if="tab==='delegation' && cap.tenantAdmin" name="members">
@@ -2791,6 +3131,16 @@ const pciDelegationSlotTemplate = `
 
 
 // ---- src/issuer/views/delegation-panel.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Delegation panel view. Actions are supplied by the issuer controller.
 const pciDelegationPanelTemplate = `
 <section class="card" v-if="tab==='delegation' && cap.tenantAdmin">
@@ -2822,6 +3172,16 @@ const pciDelegationPanelTemplate = `
 
 
 // ---- src/issuer/console-template.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -2930,6 +3290,16 @@ const pciIssuerTemplate = `
 
 
 // ---- src/sr2.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 
@@ -2956,6 +3326,16 @@ const Sr2Console = {
 
 
 // ---- src/main.js ----
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 
 
 

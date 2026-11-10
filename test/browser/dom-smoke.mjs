@@ -1,3 +1,13 @@
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 // Real Chromium + the actual Vue components, without navigation or external I/O.
 // All native, identity, persistence and transport boundaries below are fixtures.
 // This does NOT replace runtime.mjs, live deployment, accessibility or wallet QA.

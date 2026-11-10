@@ -1,3 +1,13 @@
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
 import { Sr2Error, sr2Assert, sr2Hash } from './domain.js';
 // TSA exposes key names, whereas its signed JWTs identify tenant DID methods.
 // Publish the exact identifiers used in JWT headers; verifiers must not need

@@ -19,7 +19,8 @@
     "preview:fixture": "node tools/preview-fixture.mjs",
     "test:browser:dom": "node test/browser/dom-smoke.mjs",
     "test:ux-summary": "python3 -B -m unittest discover -s test/ux-runner -p test_*.py",
-    "check:maintainability": "node tools/check-maintainability.mjs"
+    "check:maintainability": "node tools/check-maintainability.mjs",
+    "check:headers": "node tools/add-licence-headers.mjs --check"
   },
   "dependencies": {
     "jsonwebtoken": "9.0.2",
