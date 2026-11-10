@@ -1,4 +1,5 @@
 import { stripModuleSyntax } from '../../../tools/lib/module-source.mjs';
+import { issuerSource } from '../../support/ui-source.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import { fixture,alpha } from '../../support/sr2-fixture.mjs';
 import { httpHarness } from '../../support/sr2-http.mjs';
@@ -14,7 +15,7 @@ function vueContext(){
  vm.createContext(ctx);vm.runInContext(fs.readFileSync('vendor/vue.global.prod.js','utf8'),ctx);Object.assign(ctx,{ref:ctx.Vue.ref,computed:ctx.Vue.computed,onMounted:ctx.Vue.onMounted,onUnmounted:ctx.Vue.onUnmounted,reactive:ctx.Vue.reactive});
  ctx.onBridgeReconnect=()=>()=>{};
  for(const file of ['src/state/store.js','src/state/reducers.js','src/components/feedback.js'])vm.runInContext(stripModuleSyntax(fs.readFileSync(file,'utf8'), file),ctx);
- vm.runInContext(stripModuleSyntax(fs.readFileSync('src/sr2.js','utf8'), 'src/sr2.js')+'\nglobalThis.component=Sr2Console;',ctx);return {ctx,messages};
+ vm.runInContext(issuerSource()+'\nglobalThis.component=Sr2Console;',ctx);return {ctx,messages};
 }
 test('both Vue templates compile offline using the pinned runtime',()=>{
  const {ctx}=vueContext();assert.equal(typeof ctx.Vue.compile(ctx.component.template),'function');

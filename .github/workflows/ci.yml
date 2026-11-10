@@ -77,6 +77,8 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/pci-browser" --no-audit --no-fund --save-exact playwright@1.62.1
           "$RUNNER_TEMP/pci-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Browser DOM fixture regression
+        run: PCI_BROWSER_MODULE="$RUNNER_TEMP/pci-browser/node_modules/playwright/index.mjs" node test/browser/dom-smoke.mjs
       - name: Browser component and layout regression
         run: PCI_BROWSER_MODULE="$RUNNER_TEMP/pci-browser/node_modules/playwright/index.mjs" node test/browser/runtime.mjs
   charts:
