@@ -70,9 +70,13 @@ unformatted file.
 are exempt), 900 lines per authored file and three statement starts per line; for
 `src/issuer/`, 240 lines per module, 350 per view module, 100 lines per function and
 decision complexity 20, with composition factories (`createPci*`) exempt from the
-function-length limit only. A file that does not yet meet a rule is listed under
-`exceptions` with its reason and the issue that removes the entry; an exception for a
-file that does not exist fails the gate. The gate reports the UI and backend import
+function-length limit only; for `backend/`, 100 lines per function and decision
+complexity 20, with the factories `createPci*`, `createSr2*` and `extendSr2*` exempt
+from the function-length limit only. A file that does not yet meet a rule is listed
+under `exceptions` with its reason and the issue that removes the entry; an exception
+for a file that does not exist, or for a rule the file meets again, fails the gate, so
+the list can only shrink. The current list names the backend functions that still
+await their characterisation tests and refactoring. The gate reports the UI and backend import
 graphs in the same run. These limits are regression guardrails, not a definition of
 maintainability.
 

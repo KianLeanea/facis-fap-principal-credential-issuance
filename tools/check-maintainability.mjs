@@ -96,11 +96,26 @@ export function measureSource(source, filename = '<source>') {
 function exemptions(file) {
   return new Set(rules.exceptions.filter(e => e.file === file).flatMap(e => e.rules));
 }
-export function sourceViolations(metric) {
+function functionViolations(file, metric, scope, exempt) {
+  const errors = [];
+  for (const fn of metric.functions) {
+    // A composition factory contains nested handlers but remains file-bounded.
+    const factory = [scope.compositionFactoryPrefix, ...(scope.compositionFactoryPrefixes || [])].filter(Boolean).some(prefix => fn.name
+      .startsWith(prefix));
+    if (!exempt.has('function-lines') && !factory && fn.lines > scope.functionLines) {
+      errors.push(`${file}:${fn.line}: handler exceeds ${scope.functionLines} lines`);
+    }
+    if (!exempt.has('function-complexity') && fn.complexity > scope.functionComplexity) {
+      errors.push(`${file}:${fn.line}: function complexity exceeds ${scope.functionComplexity}`);
+    }
+  }
+  return errors;
+}
+export function sourceViolations(metric, exempt = exemptions(normalizeFile(metric.file))) {
   const errors = [],
   file = normalizeFile(metric.file),
-  exempt = exemptions(file),
-  issuer = rules.issuer;
+  issuer = rules.issuer,
+  backend = rules.backend;
   if (!exempt.has('line-length') && metric.maxLine > rules.lineLength) errors.push(`${file}: line exceeds ${rules.lineLength} characters`);
   if (!exempt.has('file-lines') && metric.lines > rules.fileLines) errors.push(`${file}: source exceeds ${rules.fileLines} lines`);
   if (!exempt.has('statements-per-line') && metric.maxStatementsPerLine > rules.statementsPerLine) {
@@ -109,15 +124,31 @@ export function sourceViolations(metric) {
   if (file.startsWith(issuer.pathPrefix)) {
     const limit = file.includes('/views/') ? issuer.viewModuleLines: issuer.moduleLines;
     if (!exempt.has('module-lines') && metric.lines > limit) errors.push(`${file}: issuer module exceeds ${limit} lines`);
-    for (const fn of metric.functions) {
-      // A composition factory contains nested handlers but remains file-bounded.
-      if (!exempt.has('function-lines') && !fn.name.startsWith(issuer.compositionFactoryPrefix) && fn.lines > issuer.functionLines) {
-        errors.push(`${file}:${fn.line}: handler exceeds ${issuer.functionLines} lines`);
-      }
-      if (!exempt.has('function-complexity') && fn.complexity > issuer.functionComplexity) {
-        errors.push(`${file}:${fn.line}: function complexity exceeds ${issuer.functionComplexity}`);
-      }
+    errors.push(...functionViolations(file, metric, issuer, exempt));
+  }
+  if (backend && file.startsWith(backend.pathPrefix)) errors.push(...functionViolations(file, metric, backend, exempt));
+  return errors;
+}
+// An exception is stale when its file is gone or when the file meets the rule
+// again; both fail the gate, so the list shrinks with the refactorings.
+const RULE_PATTERNS = {
+  'line-length': / line exceeds /,
+  'file-lines': / source exceeds /,
+  'statements-per-line': / packed onto one line/,
+  'module-lines': / module exceeds /,
+  'function-lines': / handler exceeds /,
+  'function-complexity': / complexity exceeds /
+};
+function staleExceptions(files, metrics) {
+  const errors = [];
+  for (const exception of rules.exceptions) {
+    if (!files.includes(exception.file)) {
+      errors.push(`${exception.file}: exception for a file that does not exist`);
+      continue;
     }
+    const unexempted = sourceViolations(metrics.find(m => normalizeFile(m.file) === exception.file), new Set());
+    for (const rule of exception.rules) if (!unexempted.some(e => RULE_PATTERNS[rule]?.test(e))) errors.push(
+      `${exception.file}: exception for ${rule}, which the file now meets`);
   }
   return errors;
 }
@@ -129,9 +160,12 @@ export function checkMaintainability(root = process.cwd()) {
   const load = file => fs.readFileSync(path.join(root, file), 'utf8');
   const ui = inspectBundleGraph(PCI_UI_MODULES, { externals: pciUiRuntimeBindings, assets: ['src/styles.css'], load });
   const backend = inspectBundleGraph(PCI_SR2_MODULES.map(file => 'backend/sr2/' + file), { externals: pciNativeRuntimeBindings, load });
-  const staleExceptions = rules.exceptions.filter(e => !files.includes(e.file)).map(e =>
-    `${e.file}: exception for a file that does not exist`);
-  const errors = [...metrics.flatMap(sourceViolations), ...ui.errors, ...backend.errors, ...staleExceptions];
+  const errors = [
+    ...metrics.flatMap(m => sourceViolations(m)),
+    ...ui.errors,
+    ...backend.errors,
+    ...staleExceptions(files, metrics)
+  ];
   return {
     status: errors.length ? 'FAIL': 'PASS',
     scope: 'Authored JavaScript in backend, src, shared, tools and build.js',
@@ -145,7 +179,8 @@ export function checkMaintainability(root = process.cwd()) {
       lineLength: rules.lineLength,
       fileLines: rules.fileLines,
       statementsPerLine: rules.statementsPerLine,
-      issuer: rules.issuer
+      issuer: rules.issuer,
+      backend: rules.backend
     },
     exceptions: rules.exceptions,
     files: metrics.length,
