@@ -101,6 +101,7 @@ test/tests/integration/issuer-features.test.mjs
 test/tests/integration/issuer-modules.test.mjs
 test/tests/integration/rc9-sandbox.test.mjs
 test/tests/integration/review-hardening.test.mjs
+test/tests/integration/sr2-http-guards.test.mjs
 test/tests/integration/sr2-http.test.mjs
 test/tests/integration/sr2-ui.test.mjs
 test/tests/integration/ui-transport.test.mjs
