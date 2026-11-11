@@ -91,10 +91,12 @@ test/bdd/features/steps/administration.py
 test/browser/dom-smoke.mjs
 test/browser/runtime.mjs
 test/support/browser-fixture.mjs
+test/support/function-node.mjs
 test/support/issuer-controller.mjs
 test/support/ui-bridge.mjs
 test/support/ui-source.mjs
 test/tests/bdd/tenant-foundation.test.mjs
+test/tests/integration/auth-characterisation.test.mjs
 test/tests/integration/issuer-features.test.mjs
 test/tests/integration/issuer-modules.test.mjs
 test/tests/integration/rc9-sandbox.test.mjs
