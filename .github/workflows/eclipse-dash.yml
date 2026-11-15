@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       request_reviews:
@@ -76,33 +77,11 @@ jobs:
 
       - name: Build additional dependency inventory
         run: |
-          python - <<'PY'
-          import json
-          import re
-          from pathlib import Path
-          from urllib.parse import urlsplit
-
-          report = json.loads(Path("dash-evidence/python-resolved.json").read_text())
-          identifiers = {"pypi/pypi/-/reportlab/4.4.9"}
-          for item in report["install"]:
-              download = item["download_info"]
-              vcs = download.get("vcs_info")
-              if vcs:
-                  url = urlsplit(download["url"])
-                  if url.hostname != "github.com" or vcs["vcs"] != "git":
-                      raise RuntimeError("Unsupported VCS dependency: " + download["url"])
-                  repository = url.path.strip("/").removesuffix(".git")
-                  if len(repository.split("/")) != 2:
-                      raise RuntimeError("Unexpected GitHub repository path")
-                  identifiers.add("git/github/" + repository + "/" + vcs["commit_id"])
-              else:
-                  metadata = item["metadata"]
-                  name = re.sub(r"[-_.]+", "-", metadata["name"]).lower()
-                  identifiers.add("pypi/pypi/-/" + name + "/" + metadata["version"])
-          Path("dash-evidence/other-dependencies.txt").write_text(
-              "\n".join(sorted(identifiers)) + "\n"
-          )
-          PY
+          python -B -m unittest discover -s security -p test_dash_python_inventory.py
+          python security/dash_python_inventory.py \
+            --report dash-evidence/python-resolved.json \
+            --provenance dash-evidence/bdd-provenance.json \
+            --out dash-evidence/other-dependencies.txt
           test -s package-lock.json
           test -s dash-evidence/go.sum
           test -s dash-evidence/other-dependencies.txt
