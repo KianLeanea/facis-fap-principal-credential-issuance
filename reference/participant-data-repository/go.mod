@@ -1,6 +1,6 @@
 module github.com/eclipse-xfsc/facis-fap-principal-credential-issuance/reference/participant-data-repository
 
-go 1.26.10
+go 1.26.11
 
 require (
 	github.com/eclipse-xfsc/crypto-provider-core/v2 v2.3.0
