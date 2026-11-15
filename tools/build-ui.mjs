@@ -10,7 +10,7 @@
 // Assisted-by: AI
 import { inspectBundleGraph, pciUiRuntimeBindings } from './lib/bundle-graph.mjs';
 import { PCI_UI_MODULES } from './lib/bundle-inputs.mjs';
-import { stripModuleSyntax } from './lib/module-source.mjs';
+import { stripModuleSyntax, validateScript } from './lib/module-source.mjs';
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
@@ -33,6 +33,7 @@ let bundle = [
 ].join('\n');
 bundle = bundle.replaceAll("__FAP_PCI_VERSION__", releaseVersion);
 if (bundle.includes("__FAP_PCI_VERSION__")) throw new Error("unresolved release version placeholder in UI bundle");
+validateScript(bundle, "generated UI index.js");
 await mkdir(outDir, { recursive: true });
 await writeFile(path.join(outDir, "index.js"), bundle);
 await copyFile(path.join(root, "src", "index.html"), path.join(outDir, "index.html"));
