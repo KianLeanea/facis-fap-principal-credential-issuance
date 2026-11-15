@@ -133,7 +133,7 @@ function uiUrl(host, basePath = "") {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 function inferBasePathFromUiLocation(pathname) {
   const value = String(pathname || "");
   const match = /^(.*)\/ui(?:\/.*)?$/.exec(value);
@@ -198,7 +198,7 @@ async function sha256UrlSafe(value) {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 const store = reactive({
   session: null,
   step: null,
@@ -238,7 +238,7 @@ const store = reactive({
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 function normalizeUiError(error) {
   return {
     category: error?.category || (error?.status >= 502 ? 'integration': 'system'),
@@ -323,9 +323,9 @@ function reduceUiMessage(envelope, pending) {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
+;
+;
+;
 const bridgePending = new Map();
 let bridgeClient, bridgeGrant, bridgeBootstrap, bridgeStarted = false, bridgeWasReady = false;
 let bridgeReadyWaiters = [], bridgeGeneration = 0, bridgeConnectedSocket = null;
@@ -492,7 +492,7 @@ const bridgePing = () => sendCommand('', {}, 'ping');
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 const UiFeedback = {
   props: ['error'],
   emits: ['dismiss', 'recover'],
@@ -589,10 +589,10 @@ const UiField = {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
-
+;
+;
+;
+;
 async function request(path, options = {}) {
   // Only the cookie/redirect lifecycle uses HTTP. Application reads and writes
   // travel through the authenticated UIBUILDER contract.
@@ -644,9 +644,9 @@ const api = {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
+;
+;
+;
 const PREFIX = "fap-pci-oidc";
 async function beginLogin(native = false) {
   const config = await api.authConfig();
@@ -781,7 +781,7 @@ const PCI_QR_ALIGNMENT = [
 
 
 // ---- src/qr.js ----
-
+;
 // QR byte-mode encoder, error correction L, versions 1–40. No network or
 // browser storage. Tables and placement conventions credit in vendor notice.
 function pciQrMatrix(text, forcedMask = null) {
@@ -1058,7 +1058,7 @@ function newPciConfigurationForm() {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 /** Per-component state. Secret inputs stay in memory and are not persisted here. */
 function createPciIssuerState({ ref, props, runtime, window }) {
   const query = ref('');
@@ -1390,7 +1390,7 @@ function createPciIdentityActions(state, dependencies) {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 /** Configurations operations with explicit state and I/O dependencies. */
 function createPciConfigurationActions(state, dependencies) {
   const { selected, versions, configForm, preview, configs, notice, restoreVersion } = state;
@@ -1619,7 +1619,7 @@ function createPciTenantActions(state, dependencies) {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
+;
 /** Connectors operations with explicit state and I/O dependencies. */
 function createPciConnectorActions(state, dependencies) {
   const { connector, connectorForm, connectors, notice } = state;
@@ -2079,21 +2079,21 @@ function createPciOperationRunner(state, normalizeError, recoverInput) {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
 /**
  * Compose issuer features. Browser, transport and Vue APIs are supplied explicitly.
  * A caller can replace those boundaries in tests without changing domain modules.
@@ -3182,15 +3182,15 @@ const pciDelegationPanelTemplate = `
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
-
-
-
-
-
-
+;
+;
+;
+;
+;
+;
+;
+;
+;
 // Workspace shell; independent feature panels are composed without extra runtime requests.
 const pciIssuerTemplate = `
 <section class="sr2-console" aria-label="Credential issuance workspace">
@@ -3300,15 +3300,15 @@ const pciIssuerTemplate = `
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
-
-
-
-
-
-
+;
+;
+;
+;
+;
+;
+;
+;
+;
 // Component lifecycle only. Feature state and operations live in src/issuer/.
 const Sr2Console = {
   components: { UiFeedback, UiField },
@@ -3336,15 +3336,15 @@ const Sr2Console = {
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-
-
-
-
-
-
-
-
-
+;
+;
+;
+;
+;
+;
+;
+;
+;
 const App = {
   components: { Sr2Console, UiFeedback, UiProgress, UiField },
   setup() {
