@@ -11,10 +11,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-
 test('every authored source file carries the project licence header', () => {
   const output = execFileSync(process.execPath, ['tools/add-licence-headers.mjs', '--check'], { encoding: 'utf8' });
-  const summary = JSON.parse(output.trim().split('\n').at(-1));
+  const summary = JSON.parse(output.trim().split('\n').at(- 1));
   assert.equal(summary.status, 'PASS');
   assert.equal(summary.missing, 0);
   assert.ok(summary.files > 200, 'scope covers the authored sources');
