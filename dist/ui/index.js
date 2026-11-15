@@ -113,7 +113,7 @@ function uiUrl(host, basePath = "") {
 
 
 // ---- src/config/runtime.js ----
-
+;
 function inferBasePathFromUiLocation(pathname) {
   const value = String(pathname || "");
   const match = /^(.*)\/ui(?:\/.*)?$/.exec(value);
@@ -158,7 +158,7 @@ async function sha256UrlSafe(value) {
 
 
 // ---- src/state/store.js ----
-
+;
 const store = reactive({
   session: null,
   step: null,
@@ -188,7 +188,7 @@ const store = reactive({
 
 
 // ---- src/state/reducers.js ----
-
+;
 function normalizeUiError(error) {
   return {
     category: error?.category || (error?.status >= 502 ? 'integration': 'system'),
@@ -263,9 +263,9 @@ function reduceUiMessage(envelope, pending) {
 
 
 // ---- src/services/transport.js ----
-
-
-
+;
+;
+;
 const bridgePending = new Map();
 let bridgeClient, bridgeGrant, bridgeBootstrap, bridgeStarted = false, bridgeWasReady = false;
 let bridgeReadyWaiters = [], bridgeGeneration = 0, bridgeConnectedSocket = null;
@@ -422,7 +422,7 @@ const bridgePing = () => sendCommand('', {}, 'ping');
 
 
 // ---- src/components/feedback.js ----
-
+;
 const UiFeedback = {
   props: ['error'],
   emits: ['dismiss', 'recover'],
@@ -463,10 +463,10 @@ const UiField = {
 
 
 // ---- src/services/api.js ----
-
-
-
-
+;
+;
+;
+;
 async function request(path, options = {}) {
   // Only the cookie/redirect lifecycle uses HTTP. Application reads and writes
   // travel through the authenticated UIBUILDER contract.
@@ -508,9 +508,9 @@ const api = {
 
 
 // ---- src/services/auth.js ----
-
-
-
+;
+;
+;
 const PREFIX = "fap-pci-oidc";
 async function beginLogin(native = false) {
   const config = await api.authConfig();
@@ -645,7 +645,7 @@ const PCI_QR_ALIGNMENT = [
 
 
 // ---- src/qr.js ----
-
+;
 // QR byte-mode encoder, error correction L, versions 1–40. No network or
 // browser storage. Tables and placement conventions credit in vendor notice.
 function pciQrMatrix(text, forcedMask = null) {
@@ -1641,15 +1641,15 @@ const Sr2Console = {
 
 
 // ---- src/main.js ----
-
-
-
-
-
-
-
-
-
+;
+;
+;
+;
+;
+;
+;
+;
+;
 const App = {
   components: { Sr2Console, UiFeedback, UiProgress, UiField },
   setup() {
