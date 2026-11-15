@@ -90,12 +90,15 @@ jobs:
             dash-evidence/other-dependencies.txt \
             > dash-evidence/input-sha256.txt
 
-      - name: Download official Eclipse Dash tool
+      - name: Verify Dash downloader regressions
+        run: python3 -B -m unittest discover -s scripts -p test_dash_download.py
+
+      - name: Download checksum-pinned Eclipse Dash tool
         env:
-          DASH_VERSION: 1.1.0
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL --retry 3 -o dash-licenses.jar \
-            "https://repo.eclipse.org/content/repositories/dash-licenses-releases/org/eclipse/dash/org.eclipse.dash.licenses/${DASH_VERSION}/org.eclipse.dash.licenses-${DASH_VERSION}.jar"
+          python3 scripts/download-dash.py --output dash-licenses.jar \
+            --provenance dash-evidence/tool-source.json
           unzip -t dash-licenses.jar > /dev/null
           sha256sum dash-licenses.jar > dash-evidence/tool-sha256.txt
 
