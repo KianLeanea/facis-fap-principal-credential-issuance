@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { publicUrl, uiUrl, withBasePath } from "../../../shared/public-url.js";
-
 const scenarios = [
   {
     name: "root",
@@ -25,7 +24,6 @@ const scenarios = [
     tenantUi: "https://alpha-pci.example.com/platform/orce/ui/",
   },
 ];
-
 for (const scenario of scenarios) {
   test(`acceptance scenario: ${scenario.name}`, () => {
     assert.equal(uiUrl("pci.example.com", scenario.basePath), scenario.mainUi);
@@ -39,7 +37,6 @@ for (const scenario of scenarios) {
     }
   });
 }
-
 test("Gateway pass-through path and backend httpNodeRoot path are identical", () => {
   assert.equal(withBasePath("/api/v1/foo", "/BASE"), "/BASE/api/v1/foo");
   assert.equal(withBasePath("/api/v1/foo", "/platform/orce"), "/platform/orce/api/v1/foo");
