@@ -8,9 +8,9 @@
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-import { inspectBundleGraph, pciUiRuntimeBindings } from './lib/bundle-graph.mjs';
-import { PCI_UI_MODULES } from './lib/bundle-inputs.mjs';
-import { stripModuleSyntax, validateScript } from './lib/module-source.mjs';
+import { inspectBundleGraph, pciUiRuntimeBindings } from "./lib/bundle-graph.mjs";
+import { PCI_UI_MODULES } from "./lib/bundle-inputs.mjs";
+import { stripModuleSyntax, validateScript } from "./lib/module-source.mjs";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
