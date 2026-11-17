@@ -4,23 +4,16 @@
 // Unsupported module-only constructs fail before a bundle is emitted.
 import { parse } from 'acorn';
 import { Script } from 'node:vm';
-
-const functionTypes = new Set([
-  'FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression',
-]);
-
+const functionTypes = new Set(['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression',]);
 function rejectModuleOnlySyntax(node, filename, depth = 0) {
   if (!node || typeof node.type !== 'string') return;
   if (node.type === 'MetaProperty' && node.meta.name === 'import') {
     throw new Error(`${filename}: import.meta is unsupported in a flat bundle`);
   }
-  if (depth === 0 && (
-    node.type === 'AwaitExpression' ||
-    (node.type === 'ForOfStatement' && node.await)
-  )) {
+  if (depth === 0 && (node.type === 'AwaitExpression' || (node.type === 'ForOfStatement' && node.await))) {
     throw new Error(`${filename}: top-level await is unsupported in a flat bundle`);
   }
-  const nextDepth = depth + (functionTypes.has(node.type) ? 1 : 0);
+  const nextDepth = depth + (functionTypes.has(node.type) ? 1: 0);
   for (const value of Object.values(node)) {
     if (Array.isArray(value)) {
       for (const child of value) {
@@ -31,17 +24,13 @@ function rejectModuleOnlySyntax(node, filename, depth = 0) {
     }
   }
 }
-
 function parseSource(source, filename, sourceType) {
   try {
-    return parse(source, {
-      ecmaVersion: 'latest', sourceType, allowReturnOutsideFunction: true,
-    });
+    return parse(source, { ecmaVersion: 'latest', sourceType, allowReturnOutsideFunction: true, });
   } catch (error) {
     throw new Error(`${filename}: ${error.message}`, { cause: error });
   }
 }
-
 export function stripModuleSyntax(source, filename = '<source>') {
   const program = parseSource(source, filename, 'module');
   rejectModuleOnlySyntax(program, filename);
@@ -52,8 +41,7 @@ export function stripModuleSyntax(source, filename = '<source>') {
         if (specifier.type === 'ImportNamespaceSpecifier') {
           throw new Error(`${filename}: namespace imports are unsupported in a flat bundle`);
         }
-        if (specifier.type === 'ImportSpecifier' &&
-            specifier.imported.name !== specifier.local.name) {
+        if (specifier.type === 'ImportSpecifier' && specifier.imported.name !== specifier.local.name) {
           throw new Error(`${filename}: aliased imports need an explicit runtime binding`);
         }
       }
@@ -67,10 +55,7 @@ export function stripModuleSyntax(source, filename = '<source>') {
         }
         edits.push([statement.start, statement.end, ';']);
       }
-    } else if (
-      statement.type === 'ExportDefaultDeclaration' ||
-      statement.type === 'ExportAllDeclaration'
-    ) {
+    } else if (statement.type === 'ExportDefaultDeclaration' || statement.type === 'ExportAllDeclaration') {
       throw new Error(`${filename}: ${statement.type} is unsupported in a flat bundle`);
     }
   }
@@ -81,7 +66,6 @@ export function stripModuleSyntax(source, filename = '<source>') {
   parseSource(result, filename, 'script');
   return result;
 }
-
 export function validateScript(source, filename = '<script>') {
   try {
     new Script(source, { filename });
@@ -89,10 +73,6 @@ export function validateScript(source, filename = '<script>') {
     throw new Error(`${filename}: ${error.message}`, { cause: error });
   }
 }
-
 export function validateFunctionBody(source, filename = '<function>') {
-  validateScript(
-    `(async function(msg, send, done) {\n${source}\n})`,
-    filename,
-  );
+  validateScript(`(async function(msg, send, done) {\n${source}\n})`, filename,);
 }
