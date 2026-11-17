@@ -17,31 +17,58 @@ import { stripModuleSyntax } from '../../tools/lib/module-source.mjs';
 import { issuerSource } from '../support/ui-source.mjs';
 import { fixture, alpha } from '../support/sr2-fixture.mjs';
 import { httpHarness } from '../support/sr2-http.mjs';
-const { chromium } = await import(process.env.PCI_BROWSER_MODULE || 'playwright');
-const f = fixture(); await f.prepared(); const dispatch = httpHarness(f);
-const tenant = { tenantId: alpha, organizationName: 'Alpha', primaryDomain: 'alpha-pci.example.com', state: 'active' };
+const { chromium } = await import (process.env.PCI_BROWSER_MODULE || 'playwright');
+const f = fixture();
+await f.prepared();
+const dispatch = httpHarness(f);
+const tenant = {
+  tenantId: alpha,
+  organizationName: 'Alpha',
+  primaryDomain: 'alpha-pci.example.com',
+  state: 'active'
+};
 const version = fs.readFileSync('VERSION', 'utf8').trim();
 const source = file => stripModuleSyntax(fs.readFileSync(file, 'utf8'), file).replaceAll('__FAP_PCI_VERSION__', version);
 const logo = 'data:image/svg+xml;base64,' + fs.readFileSync('src/assets/facis-logo.svg').toString('base64');
-let browser; const failures = [], geometries = [];
+let browser;
+const failures = [], geometries = [];
 try {
-  browser = await chromium.launch({ headless: true,
-    ...(process.env.PCI_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PCI_CHROMIUM_EXECUTABLE } : {}),
-    ...(process.env.PCI_BROWSER_NO_SANDBOX === '1' ? { args: ['--no-sandbox'] } : {}) });
+  browser = await chromium.launch({
+    headless: true,
+    ...(process.env.PCI_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PCI_CHROMIUM_EXECUTABLE }: {}),
+    ...(process.env.PCI_BROWSER_NO_SANDBOX === '1' ? { args: ['--no-sandbox'] }: {})
+  });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   page.on('pageerror', error => failures.push(error.message));
-  await page.exposeFunction('__pciDispatch', async (path, options) => {
-    if (path.endsWith('/identity-provider')) return { status: 200, body: {
-      item: { version: 1, state: 'active', mode: 'keycloak', displayName: 'Organization account', issuer: '', clientId: '', audience: '', scopes: 'openid profile email' }, redirectUri: 'https://identity.example.com/broker/endpoint' } };
+  await page.exposeFunction('__pciDispatch', async(path, options) => {
+    if (path.endsWith('/identity-provider')) return {
+      status: 200,
+      body: {
+        item: {
+          version: 1,
+          state: 'active',
+          mode: 'keycloak',
+          displayName: 'Organization account',
+          issuer: '',
+          clientId: '',
+          audience: '',
+          scopes: 'openid profile email'
+        },
+        redirectUri: 'https://identity.example.com/broker/endpoint'
+      }
+    };
     return dispatch(path, options);
   });
   for (const view of ['registration', 'provider', 'welcome', 'tenant']) {
-    const session = view === 'provider' ? { subject: 'provider', username: 'Provider', roles: ['provider_admin'] } : view === 'tenant' ? f.principal() : null;
-    const tenantData = ['tenant', 'welcome'].includes(view) ? tenant : null;
-    await page.setContent('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCI isolated component preview</title></head><body><div id="app"></div></body></html>');
+    const session = view === 'provider' ? { subject: 'provider', username: 'Provider', roles: ['provider_admin'] }: view === 'tenant' ? f
+      .principal(): null;
+    const tenantData = ['tenant', 'welcome'].includes(view) ? tenant: null;
+    await page.setContent(
+      '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCI isolated component preview</title></head><body><div id="app"></div></body></html>');
     await page.addStyleTag({ content: fs.readFileSync('src/styles.css', 'utf8') });
     await page.addScriptTag({ content: fs.readFileSync('vendor/vue.global.prod.js', 'utf8') });
-    await page.addScriptTag({ content: `(() => {
+    await page.addScriptTag({
+      content: `(() => {
       const memory = new Map();
       const localLocation = { origin: 'https://fixture.invalid', hostname: 'fixture.invalid', pathname: '/pci-orce/ui/', search: '', hash: ${JSON.stringify(view === 'provider' ? '#/provider' : '')}, assign() {}, reload() {} };
       const window = new Proxy(globalThis.window, { get(target, key) {
@@ -72,18 +99,27 @@ try {
       ${source('src/qr.js')}
       ${issuerSource()}
       ${source('src/main.js')}
-    })();` });
+    })();`
+    });
     await page.locator('.app-shell').waitFor();
-    await page.locator('img[alt="FACIS"]').evaluateAll((images, logo) => images.forEach(img => { img.src = logo; }), logo);
+    await page.locator('img[alt="FACIS"]').evaluateAll((images, logo) => images.forEach(img => {
+      img.src = logo;
+    }), logo);
     if (view === 'tenant') await page.getByRole('button', { name: 'Tenant settings', exact: true }).waitFor();
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
       const geometry = await page.evaluate(() => {
         const shell = document.querySelector('.app-shell');
-        return { width: shell.getBoundingClientRect().width, overflow: document.documentElement.scrollWidth > innerWidth + 2, radius: getComputedStyle(shell).borderRadius };
+        return {
+          width: shell.getBoundingClientRect().width,
+          overflow: document.documentElement.scrollWidth > innerWidth + 2,
+          radius: getComputedStyle(shell).borderRadius
+        };
       });
-      assert.ok(geometry.width <= 1200); assert.equal(geometry.overflow, false, `${view}: overflow at ${width}`);
-      assert.equal(geometry.radius, '20px'); geometries.push({ view, viewport: width, ...geometry });
+      assert.ok(geometry.width <= 1200);
+      assert.equal(geometry.overflow, false, `${view}: overflow at ${width}`);
+      assert.equal(geometry.radius, '20px');
+      geometries.push({ view, viewport: width, ...geometry });
     }
   }
   await page.getByRole('button', { name: 'Tenant settings', exact: true }).click();
@@ -100,7 +136,8 @@ try {
   await page.getByRole('button', { name: 'Save draft', exact: true }).click();
   await page.getByRole('button', { name: 'Validate', exact: true }).click();
   await page.getByRole('alert').waitFor();
-  const error = await page.getByRole('alert').innerText(); assert.match(error, /prerequisite|connector|journey/i);
+  const error = await page.getByRole('alert').innerText();
+  assert.match(error, /prerequisite|connector|journey/i);
   await page.getByRole('button', { name: 'Tenant settings', exact: true }).click();
   await page.getByRole('button', { name: 'Refresh', exact: true }).click();
   assert.equal(await page.getByRole('alert').innerText(), error);
@@ -110,5 +147,25 @@ try {
   await page.getByRole('heading', { name: 'Verify your credential', exact: true }).waitFor();
   if (process.env.PCI_BROWSER_SCREENSHOT) await page.screenshot({ path: process.env.PCI_BROWSER_SCREENSHOT, fullPage: true });
   assert.deepEqual(failures, []);
-  console.log(JSON.stringify({ suite: 'offline-dom-smoke', status: 'PASS', browser: await browser.version(), transport: 'IN_MEMORY_FIXTURE', cloudDeployment: 'NOT_RUN', pageErrors: failures, geometries, checks: ['four-views', 'two-viewport-layouts', 'separate-settings-tasks', 'create-configuration', 'typed-validation', 'persistent-error', 'dismiss-error', 'presentation-panel'] }));
-} finally { await browser?.close(); }
+  console.log(JSON.stringify({
+    suite: 'offline-dom-smoke',
+    status: 'PASS',
+    browser: await browser.version(),
+    transport: 'IN_MEMORY_FIXTURE',
+    cloudDeployment: 'NOT_RUN',
+    pageErrors: failures,
+    geometries,
+    checks: [
+      'four-views',
+      'two-viewport-layouts',
+      'separate-settings-tasks',
+      'create-configuration',
+      'typed-validation',
+      'persistent-error',
+      'dismiss-error',
+      'presentation-panel'
+    ]
+  }));
+} finally {
+  await browser?.close();
+}
