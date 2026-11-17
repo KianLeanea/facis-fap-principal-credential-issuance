@@ -24,7 +24,7 @@ concurrency:
 jobs:
   licence-scan:
     name: Licence gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     defaults:
       run:
@@ -68,7 +68,7 @@ jobs:
         run: |
           python -m pip install --dry-run --ignore-installed \
             --report dash-evidence/python-resolved.json \
-            -r test/bdd/requirements.txt \
+            -r test/bdd/requirements.txt -c test/bdd/constraints.txt \
             PyLD==2.0.4 rdflib==7.1.4 pyshacl==0.30.1 PyYAML==6.0.2
 
       - name: Build additional dependency inventory
@@ -108,12 +108,15 @@ jobs:
             dash-evidence/other-dependencies.txt \
             > dash-evidence/input-sha256.txt
 
-      - name: Download official Eclipse Dash tool
+      - name: Verify Dash downloader regressions
+        run: python3 -B -m unittest discover -s scripts -p test_dash_download.py
+
+      - name: Download checksum-pinned Eclipse Dash tool
         env:
-          DASH_VERSION: 1.1.0
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL --retry 3 -o dash-licenses.jar \
-            "https://repo.eclipse.org/content/repositories/dash-licenses-releases/org/eclipse/dash/org.eclipse.dash.licenses/${DASH_VERSION}/org.eclipse.dash.licenses-${DASH_VERSION}.jar"
+          python3 scripts/download-dash.py --output dash-licenses.jar \
+            --provenance dash-evidence/tool-source.json
           unzip -t dash-licenses.jar > /dev/null
           sha256sum dash-licenses.jar > dash-evidence/tool-sha256.txt
 
