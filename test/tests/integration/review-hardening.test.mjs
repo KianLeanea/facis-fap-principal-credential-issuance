@@ -34,7 +34,7 @@ test('holder proof accepts a correctly signed public-only ES256 key', () => {
   assert.equal(pciHolderProof(signedProof(), binding, now).jwk.kty, 'EC');
 });
 for (const property of ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k']) test('holder proof rejects any private-key field: ' + property, () =>
-  {
+{
   assert.throws(() => pciHolderProof(signedProof(h => {
     h.jwk[property] = '';
   }), binding, now), e => e.status === 400);

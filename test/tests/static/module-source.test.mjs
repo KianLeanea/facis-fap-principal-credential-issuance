@@ -1,18 +1,29 @@
-import test from "node:test";
-import assert from "node:assert/strict";
-import vm from "node:vm";
-import fs from "node:fs";
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+// Prepared with AI-assisted tools and reviewed by the author.
+// Assisted-by: AI
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import fs from 'node:fs';
 import {
   stripModuleSyntax,
   validateScript,
   validateFunctionBody
-} from "../../../tools/lib/module-source.mjs";
-import { formatSource } from "../../../tools/format-source.mjs";
-import { parse } from "acorn";
-import path from "node:path";
-import os from "node:os";
-import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+} from '../../../tools/lib/module-source.mjs';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { formatSource } from '../../../tools/format-source.mjs';
+import { parse } from 'acorn';
+import { PCI_UI_MODULES, PCI_SR2_MODULES } from '../../../tools/lib/bundle-inputs.mjs';
 test('bundle transformation preserves executable statements after same-line imports', () => {
   const source = "import crypto from 'node:crypto'; export const answer = 42;";
   const transformed = stripModuleSyntax(source);
@@ -43,7 +54,7 @@ test('formatting preserves ASI-sensitive return semantics, comments, strings and
   assert.equal(vm.runInNewContext(stripModuleSyntax(after) + "\nliteral"), "import x;");
 });
 test('source formatting is idempotent for representative runtime and UI modules', () => {
-  for (const file of ['backend/sr2/domain.js', 'backend/sr2/service.js', 'src/sr2.js']) {
+  for (const file of ['backend/sr2/domain.js', 'backend/sr2/service-policy.js', 'src/sr2.js']) {
     const formatted = formatSource(fs.readFileSync(file, 'utf8'));
     assert.equal(formatSource(formatted), formatted, file);
   }
@@ -116,12 +127,7 @@ function expectBuildFailure(root, script, output, reason) {
   assert.equal(fs.existsSync(path.join(root, output)), false);
 }
 function uiFixture(root) {
-  const program = parse(fs.readFileSync(path.join(repositoryRoot, 'tools/build-ui.mjs'), 'utf8'),
-    { ecmaVersion: 'latest', sourceType: 'module' },);
-  const declaration = program.body.filter(node => node.type === 'VariableDeclaration').flatMap(node => node.declarations).find(node => node
-    .id.name === 'sources');
-  assert.ok(declaration);
-  const sources = declaration.init.elements.map(node => node.value);
+  const sources = PCI_UI_MODULES;
   assert.ok(sources.length > 1);
   fixtureFile(root, 'VERSION', '0.0.0\n');
   for (const source of sources) fixtureFile(root, source);
@@ -132,8 +138,11 @@ for (const [name, source, reason] of unsupportedForms) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pci-ui-module-'));
     try {
       const sources = uiFixture(root);
-      fixtureFile(root, sources[0], source);
-      expectBuildFailure(root, 'tools/build-ui.mjs', '.build/ui/index.js', reason,);
+      const namespace = name === 'namespace import';
+      const relative = path.posix.relative(path.posix.dirname(sources[1]), sources[0]);
+      const fixtureSource = namespace ? source.replace("'./dep.js'", JSON.stringify(relative)): source;
+      fixtureFile(root, namespace ? sources[1]: sources[0], fixtureSource);
+      expectBuildFailure(root, 'tools/build-ui.mjs', '.build/ui/index.js', namespace ? /Unsupported binding.*namespace/: reason,);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -143,9 +152,9 @@ test('UI builder validates the assembled wrapper before emitting it', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pci-ui-wrapper-'));
   try {
     const sources = uiFixture(root);
-    fixtureFile(root, sources[0], 'const __fixture_collision = 1;');
-    fixtureFile(root, sources[1], 'const __fixture_collision = 2;');
-    expectBuildFailure(root, 'tools/build-ui.mjs', '.build/ui/index.js', /already been declared/,);
+    fixtureFile(root, sources[0], 'const version = "__FAP_PCI_VERSION__";');
+    fixtureFile(root, 'VERSION', '";const broken = ; //\n');
+    expectBuildFailure(root, 'tools/build-ui.mjs', '.build/ui/index.js', /generated UI index\.js/,);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -157,33 +166,7 @@ test('ORCE builder validates the assembled function before emitting flows', () =
     fixtureFile(root, 'shared/public-url.js');
     fixtureFile(root, 'docs/api/openapi.json', '{}');
     fixtureFile(root, 'backend/sr2/routes.json', '[]');
-    for (const name of [
-      'adapter-contracts',
-      'native-keys',
-      'native-metadata',
-      'service-policy',
-      'domain',
-      'journey-input',
-      'assets',
-      'participant-security',
-      'store',
-      'adapters',
-      'wire',
-      'transport',
-      'profiles',
-      'sdjwt',
-      'linked-data',
-      'native',
-      'history',
-      'semantics',
-      'service',
-      'revocation',
-      'issuance',
-      'presentation',
-      'maintenance',
-      'runtime',
-      'http',
-    ]) fixtureFile(root, `backend/sr2/${name}.js`);
+    for (const name of PCI_SR2_MODULES) fixtureFile(root, `backend/sr2/${name}`);
     for (const name of [
       '_common',
       '_identity',

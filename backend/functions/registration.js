@@ -83,7 +83,12 @@ return (async() => {
         to: contactEmail,
         subject: "Verify your FAP PCI tenant registration",
         text: `Hello ${contactName},\n\nVerify the registration for ${organizationName}:\n${verificationUrl.toString()}\n\nThis link is single-use and expires automatically.`,
-        html: `<p>Hello ${escapeHtml(contactName)},</p><p>Verify the registration for <strong>${escapeHtml(organizationName)}</strong>.</p><p><a href="${escapeHtml(verificationUrl.toString())}">Verify registration</a></p><p>This link is single-use and expires automatically.</p>`,
+        html: [
+          `<p>Hello ${escapeHtml(contactName)},</p>`,
+          `<p>Verify the registration for <strong>${escapeHtml(organizationName)}</strong>.</p>`,
+          `<p><a href="${escapeHtml(verificationUrl.toString())}">Verify registration</a></p>`,
+          '<p>This link is single-use and expires automatically.</p>'
+        ].join(''),
       });
     } catch (error) {
       delivery = "failed";
