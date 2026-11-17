@@ -70,9 +70,11 @@ function pciRuntime() {
     readSecret: async name => {
       const ca = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'),
       token = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token', 'utf8').trim();
-      const r = await pciHttp(
-        `https://${envValue('KUBERNETES_SERVICE_HOST')}:${envValue('KUBERNETES_SERVICE_PORT_HTTPS','443')}/api/v1/namespaces/${encodeURIComponent(cfg.orceNamespace)}/secrets/${encodeURIComponent(name)}`,
-        { headers: { authorization: 'Bearer ' + token }, tlsOptions: { ca }, maxBytes: 262144 });
+      const host = envValue('KUBERNETES_SERVICE_HOST');
+      const port = envValue('KUBERNETES_SERVICE_PORT_HTTPS', '443');
+      const namespace = encodeURIComponent(cfg.orceNamespace);
+      const target = `https://${host}:${port}/api/v1/namespaces/${namespace}/secrets/${encodeURIComponent(name)}`;
+      const r = await pciHttp(target, { headers: { authorization: 'Bearer ' + token }, tlsOptions: { ca }, maxBytes: 262144 });
       if (r.status !== 200) throw new Sr2Error(503, 'PCI-PARTICIPANT-SECRET', 'Participant trust material is unavailable.');
       return r.data;
     },

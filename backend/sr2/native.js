@@ -1,174 +1,35 @@
+import { pciHolderProof, pciNativeSigningKey } from './native-keys.js';
+export { pciHolderProof, pciNativeSigningKey } from './native-keys.js';
+import {
+  pciContains,
+  pciIssuanceTopic,
+  pciCompleteClaimDisplay,
+  pciNativeMetadata,
+  pciPublicCatalogue
+} from './native-metadata.js';
+export {
+  pciContains,
+  pciIssuanceTopic,
+  pciCompleteClaimDisplay,
+  pciNativeMetadata,
+  pciPublicCatalogue
+} from './native-metadata.js';
 import { pciLdpContext, pciLdpSubject } from './linked-data.js';
 export { pciLdpContext } from './linked-data.js';
 import { pciSdJwtPayload, sr2VerifySdJwt } from './sdjwt.js';
 import crypto from 'node:crypto';
 import { sr2Assert, sr2Fail, sr2Claims, sr2Hash, sr2Text, sr2ExpectedClaims } from './domain.js';
-import { sr2CommonRequest, sr2VerifyJwt, sr2VerifyCredential } from './adapters.js';
+import { sr2CommonRequest, sr2VerifyJwt, sr2VerifyCredential } from './adapter-contracts.js';
 import { pciEvent, pciReply, pciHttp, pciGrpc } from './wire.js';
 import { sr2TlsMaterial, sr2ResolvedParticipant } from './participant-security.js';
-export function pciContains(expected, actual) {
-  if (Array.isArray(expected)) return Array.isArray(actual) && expected.length === actual.length && expected.every((v, i) => pciContains(v,
-    actual[i]));
-  if (expected && typeof expected === 'object') return Boolean(actual && typeof actual === 'object' &&
-  Object.entries(expected).every(([k, v]) => Object.hasOwn(actual, k) && pciContains(v, actual[k])));
-  return expected === actual;
-}
-export function pciIssuanceTopic(tenantId, configurationId) {
-  return 'fap.pci.' + tenantId + '.' + configurationId;
-}
 // Well-Known 1.5.2 retains claim paths/mandatory flags but omits optional
 // claim display labels. Complete only absent labels from the published local
 // snapshot. Explicit native values and every substantive field remain checked.
-export function pciCompleteClaimDisplay(expected, native) {
-  if (!native || typeof native !== 'object' || Array.isArray(native)) return native;
-  // Native replies and local metadata are JSON documents, not host objects.
-  const completed = JSON.parse(JSON.stringify(native));
-  for (const [id, configuration] of Object.entries(expected.credential_configurations_supported || {})) {
-    const wanted = configuration.credential_metadata?.claims;
-    const observed = completed.credential_configurations_supported?.[id]?.credential_metadata?.claims;
-    if (!Array.isArray(wanted) || !Array.isArray(observed) || wanted.length !== observed.length) continue;
-    for (let i = 0; i < wanted.length; i++) {
-      const { display, ...definition } = wanted[i];
-      if (display !== undefined && pciContains(definition, observed[i]) && !Object.hasOwn(observed[i], 'display')) observed[i].display =
-        JSON.parse(JSON.stringify(display));
-    }
-  }
-  return completed;
-}
-export function pciNativeMetadata(bundle, assetUrl) {
-  const m = bundle.issuer,
-  base = m.issuer,
-  configs = {};
-  for (const { id, data: c } of bundle.configurations) {
-    const display = {
-      name: c.name,
-      description: c.description,
-      locale: 'en',
-      ...(c.logoAssetId ? { logo: { uri: assetUrl(bundle.tenantId, c.logoAssetId), alt_text: c.name } }: {}),
-      ...(c.backgroundAssetId ? { background_image: { uri: assetUrl(bundle.tenantId, c.backgroundAssetId) } }: {})
-    };
-    configs[c.identifier] = {
-      format: c.format,
-      scope: c.identifier,
-      cryptographic_binding_methods_supported: ['jwk'],
-      credential_signing_alg_values_supported: c.format === 'ldp_vc' ? ['JsonWebSignature2020']: c.format === 'jwt_vc_json' ?
-        ['ES256', 'PS256', 'RS256']: ['ES256'],
-      proof_types_supported: { jwt: { proof_signing_alg_values_supported: ['ES256', 'PS256', 'RS256'] } },
-      topic: pciIssuanceTopic(bundle.tenantId, id),
-      schema: {
-        type: 'object',
-        properties: Object.fromEntries(c.claims.map(x => [x.name, { type: x.type }])),
-        required: c.claims.filter(x => x.required).map(x => x.name),
-        additionalProperties: false
-      },
-      credential_metadata: {
-        display: [display],
-        claims: c.claims.map(x => ({
-          path: c.format.includes('sd-jwt') ? [x.name]: c.format === 'ldp_vc' ? ['credentialSubject', 'pciClaims', x.name]:
-            ['credentialSubject', x.name],
-          mandatory: x.required,
-          display: [{ name: x.name, locale: 'en' }]
-        }))
-      },
-      ...(c.format.includes('sd-jwt') ? { vct: c.vct }: {
-        credential_definition: {
-          type: c.credentialTypes,
-          '@context': c.format === 'ldp_vc' ? pciLdpContext(c, base): ['https://www.w3.org/2018/credentials/v1']
-        }
-      })
-    };
-  }
-  return {
-    credential_issuer: base,
-    authorization_servers: m.authorizationServers,
-    credential_endpoint: base + '/api/credential',
-    nonce_endpoint: base + '/api/nonce',
-    display: [{ name: m.displayName, locale: 'en' }],
-    credential_configurations_supported: configs
-  };
-}
 // Local archive state is authoritative for withdrawal. Nonempty catalogues must
 // still match the native publication, including the active context and claims.
-export function pciPublicCatalogue(bundle, native) {
-  const expected = pciNativeMetadata(bundle, (_, id) => bundle.issuer.issuer + '/api/v1/public/assets/' + id);
-  if (!bundle.configurations.length) return expected;
-  for (const c of Object.values(expected.credential_configurations_supported)) {
-    delete c.topic;
-    delete c.schema;
-  }
-  const filtered = pciCompleteClaimDisplay(expected, {
-    ...native,
-    credential_configurations_supported: Object.fromEntries(Object.entries(native?.credential_configurations_supported ||
-    {}).filter(([id]) => Object.hasOwn(expected.credential_configurations_supported, id)))
-  });
-  if (!pciContains(expected, filtered)) sr2Fail(503, 'PCI-METADATA-PENDING',
-    'Publish the current issuer catalogue to OCM before wallet discovery.');
-  return filtered;
-}
-export function pciHolderProof(token, { nonce, issuer }, now = Date.now()) {
-  sr2Assert(typeof token === 'string' && token.length < 16384, 'A wallet JWT proof is required.');
-  let header,
-  claims,
-  parts;
-  try {
-    parts = token.split('.');
-    sr2Assert(parts.length === 3, 'Malformed proof.');
-    header = JSON.parse(Buffer.from(parts[0], 'base64url'));
-    claims = JSON.parse(Buffer.from(parts[1], 'base64url'));
-  } catch {
-    sr2Fail(400, 'PCI-PROOF-INVALID');
-  }
-  sr2Assert(header.typ === 'openid4vci-proof+jwt' && header.jwk && !header.jwk.d && !header.jku && !header.x5u &&
-  !header.crit, 'An embedded public proof key is required.');
-  const alg = header.alg,
-  key = header.jwk;
-  sr2Assert(['ES256', 'PS256', 'RS256'].includes(alg) && (alg === 'ES256' ? key.kty === 'EC' && key.crv === 'P-256': key.kty === 'RSA'),
-    'Invalid proof key.');
-  const pub = crypto.createPublicKey({ key, format: 'jwk' });
-  if (key.kty === 'RSA') sr2Assert(pub.asymmetricKeyDetails.modulusLength >= 2048, 'Proof RSA key too small.');
-  sr2Assert(crypto.verify('sha256', Buffer.from(parts[0] + '.' + parts[1]), {
-    key: pub,
-    ...(alg === 'ES256' ? { dsaEncoding: 'ieee-p1363' }: {}),
-    ...(alg === 'PS256' ? { padding: crypto.constants.RSA_PKCS1_PSS_PADDING, saltLength: 32 }: {})
-  }, Buffer.from(parts[2], 'base64url')), 'Wallet proof signature rejected.');
-  sr2Assert(claims.aud === issuer && claims.nonce === nonce && Number.isInteger(claims.iat) && Math.abs(now / 1000 - claims.iat) <= 300,
-    'Wallet proof binding rejected.');
-  return { jwk: pub.export({ format: 'jwk' }) };
-}
 // Crypto 2.3.7 JwkPublicKey returns Crypto Core 2.3.0 GetJwk's []jwk.Key,
 // not a bare JWK. RSA responses contain separate RS256 and PS256 entries.
 // Retain the older bare-JWK/JWKS forms, but never select an arbitrary first key.
-export function pciNativeSigningKey(input, { key, did, algorithm }) {
-  const invalid = () => sr2Fail(502, 'PCI-SIGNER-JWK-INVALID', 'The signer returned an invalid public signing key.');
-  if (!['ES256', 'RS256', 'PS256'].includes(algorithm)) invalid();
-  let document = input;
-  if (typeof document === 'string') {
-    try {
-      document = JSON.parse(document);
-    } catch {
-      invalid();
-    }
-  }
-  const keys = Array.isArray(document) ? document: document && Array.isArray(document.keys) ? document.keys: [document];
-  if (!keys.length || keys.length > 20) invalid();
-  for (const candidate of keys) {
-    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate) || !['EC', 'RSA', 'OKP'].includes(candidate.kty)) invalid();
-    if (['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k'].some(field => Object.hasOwn(candidate, field))) invalid();
-    if (candidate.kid !== undefined && candidate.kid !== key && candidate.kid !== did + '#' + key) invalid();
-    if (candidate.use !== undefined && candidate.use !== 'sig') invalid();
-    if (candidate.key_ops !== undefined && (!Array.isArray(candidate.key_ops) || candidate.key_ops.length !== 1 ||
-    candidate.key_ops[0] !== 'verify')) invalid();
-  }
-  const selected = keys.filter(candidate => (candidate.alg === undefined || candidate.alg === algorithm) &&
-  (algorithm === 'ES256' ? candidate.kty === 'EC' && candidate.crv === 'P-256': candidate.kty === 'RSA'));
-  if (selected.length !== 1) invalid();
-  try {
-    crypto.createPublicKey({ key: selected[0], format: 'jwk' });
-  } catch {
-    invalid();
-  }
-  return { ...selected[0], kid: did + '#' + key };
-}
 export function createPciNativeAdapters(options) {
   const o = options,
   nats = o.nats,

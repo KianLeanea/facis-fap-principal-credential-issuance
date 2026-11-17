@@ -1,3 +1,4 @@
+import { sr2CheckVersion, sr2AuthorizePrincipal, sr2PublicResource } from './service-policy.js';
 import crypto from 'node:crypto';
 import {
   Sr2Error,
@@ -24,26 +25,8 @@ import { sr2SemanticTemplate } from './semantics.js';
 import { sr2JourneyBindings } from './journey-input.js';
 export function createSr2Service({ store, adapters, now = Date.now, pepper, allowedHosts = [], issuerUrl, assetUrl }) {
   const hashSubject = (tenantId, subject) => crypto.createHmac('sha256', pepper).update(tenantId + '\0' + subject).digest('hex');
-  function current(r, expected) {
-    if (expected === undefined || expected === null) sr2Fail(428, 'PCI-SR2-PRECONDITION', 'Supply the current If-Match version.');
-    if (expected !== r.version) sr2Fail(412, 'PCI-SR2-PRECONDITION', 'The resource changed. Reload before saving.');
-  }
-  async function authorize(tx, p, permission = 'issuer', configurationId = null) {
-    if (!p || p.tenantId !== tx.tenant.tenant_id || p.host !== tx.tenant.primary_domain) sr2Fail(404, 'PCI-SR2-NOT-FOUND');
-    if (tx.tenant.state !== 'active') sr2Fail(409, 'PCI-SR2-TENANT-INACTIVE', 'The tenant is not active.');
-    const m = await tx.member(p.subject);
-    if (!m?.enabled) sr2Fail(403, 'PCI-SR2-FORBIDDEN', 'An enabled tenant membership is required.');
-    // Membership is read on every request: revoked assignments and disabled members
-    // do not remain authorized until a cached OIDC session expires.
-    const roles = (m.roles || []).filter(r => p.roles.includes(r));
-    if (permission === 'principal') return { ...p, roles };
-    if (roles.includes('participant_tenant_admin')) return { ...p, roles };
-    if (permission === 'admin') sr2Fail(403, 'PCI-SR2-FORBIDDEN', 'Tenant administration is required.');
-    const assignments = (await tx.assignments(p.subject)).filter(a => !a.revoked);
-    if (assignments.some(a => a.configurationIds === null || (configurationId && a.configurationIds.includes(
-      configurationId)))) return { ...p, roles };
-    sr2Fail(configurationId ? 404: 403, configurationId ? 'PCI-SR2-NOT-FOUND': 'PCI-SR2-FORBIDDEN', 'Issuer delegation is required.');
-  }
+  const current = sr2CheckVersion;
+  const authorize = sr2AuthorizePrincipal;
   async function get(tx, kind, id) {
     const r = await tx.get(kind, id);
     if (!r) sr2Fail(404, 'PCI-SR2-NOT-FOUND');
@@ -70,8 +53,7 @@ export function createSr2Service({ store, adapters, now = Date.now, pepper, allo
     sr2Assert(a.state !== 'archived' && (a.configurationId === configurationId || (!a.configurationId &&
     !configurationId)), 'Asset ownership mismatch.');
     return a;
-  }
-  // Configuration grants and connector grants are separate. Missing grants in
+  } // Configuration grants and connector grants are separate. Missing grants in
   // older connector documents deny access until a tenant administrator reviews them.
   async function connectorAccess(tx, id, configurationId) {
     const c = await get(tx, 'connector', id),
@@ -120,12 +102,7 @@ export function createSr2Service({ store, adapters, now = Date.now, pepper, allo
         'Archive incompatible published configurations before changing issuer profile.');
     } else if (r.kind === 'branding' && d.logoAssetId) await referencedAsset(tx, d.logoAssetId, null);
   }
-  function publicItem(r) {
-    if (r.kind === 'asset') {
-      const { base64, ...safe } = r.draft;
-      return { ...r, draft: safe };
-    } return r;
-  }
+  const publicItem = sr2PublicResource;
   const api = {
     store,
     adapters,

@@ -42,7 +42,7 @@ async function handleSr2(allowedActions) {
     if (!['GET', 'HEAD'].includes(method)) {
       if (headers.origin && headers.origin !== `https://${host}`) throw pciErrors.forbidden();
       if (headers['sec-fetch-site'] === 'cross-site') throw pciErrors.forbidden();
-      if (!String(headers['content-type'] || '').toLowerCase().startsWith('application/json')) throw pciErrors.validation(
+      if (String(headers['content-type'] || '').split(';', 1)[0].trim().toLowerCase() !== 'application/json') throw pciErrors.validation(
         'Use application/json.');
     }
     const input = parseBody();

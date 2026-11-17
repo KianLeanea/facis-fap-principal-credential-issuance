@@ -158,6 +158,10 @@ test('ORCE builder validates the assembled function before emitting flows', () =
     fixtureFile(root, 'docs/api/openapi.json', '{}');
     fixtureFile(root, 'backend/sr2/routes.json', '[]');
     for (const name of [
+      'adapter-contracts',
+      'native-keys',
+      'native-metadata',
+      'service-policy',
       'domain',
       'journey-input',
       'assets',

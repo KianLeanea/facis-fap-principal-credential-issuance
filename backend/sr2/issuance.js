@@ -13,7 +13,7 @@ import {
   sr2Correlation,
   sr2Hash
 } from './domain.js';
-import { sr2Deadline, sr2Retry } from './adapters.js';
+import { sr2Deadline, sr2Retry } from './adapter-contracts.js';
 import { sr2HolderDid } from './history.js';
 import {
   createSr2JourneyInputs,
