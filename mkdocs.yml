@@ -46,6 +46,9 @@ nav:
   - Tests: testing/test-strategy.md
   - Live acceptance: testing/live-acceptance.md
   - Deployed UX tests: testing/ux-bdd-runbook.md
+  - Acceptance gates: release/acceptance-gates.md
+  - Maintainer guide: development/maintainer-guide.md
+  - Contribution and review workflow: development/official-workflow.md
   - Requirements: requirements/traceability.md
   - Technical clauses: requirements/technical-clauses.md
   - Operating profiles: known-gaps.md
