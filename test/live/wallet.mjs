@@ -1,12 +1,19 @@
-import { pciLdpSubject, pciLdpContext } from '../../backend/sr2/linked-data.js';
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
 // Software test wallet for synthetic acceptance only. Uses real PCI/native OCM
 // endpoints; never writes the credential, access token or holder private key.
-import crypto from 'node:crypto';
-import fs from 'node:fs';
-import { pciHttp } from '../../backend/sr2/wire.js';
-import { sr2VerifySdJwt } from '../../backend/sr2/sdjwt.js';
-import { sr2Hash } from '../../backend/sr2/domain.js';
-import { sr2HolderDid } from '../../backend/sr2/history.js';
+import { pciLdpSubject, pciLdpContext } from "../../backend/sr2/linked-data.js";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import { pciHttp } from "../../backend/sr2/wire.js";
+import { sr2VerifySdJwt } from "../../backend/sr2/sdjwt.js";
+import { sr2Hash } from "../../backend/sr2/domain.js";
+import { sr2HolderDid } from "../../backend/sr2/history.js";
 const ensure = (test, message) => {
   if (!test) throw new Error(message);
 };

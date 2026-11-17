@@ -1,18 +1,25 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import crypto from 'node:crypto';
+// Copyright (c) 2026 LEANEA GmbH and others.
+//
+// This program and the accompanying materials are made available under the
+// terms of the Apache License, Version 2.0 which is available at
+// https://www.apache.org/licenses/LICENSE-2.0.
+//
+// SPDX-License-Identifier: Apache-2.0
+import test from "node:test";
+import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import {
   sr2VerifyJwt,
   sr2Retry,
   sr2Deadline,
   sr2CommonRequest
-} from '../../../backend/sr2/adapters.js';
+} from "../../../backend/sr2/adapters.js";
 import {
   sr2ResolvedParticipant,
   sr2TlsMaterial
-} from '../../../backend/sr2/participant-security.js';
-import { extendSr2Maintenance } from '../../../backend/sr2/maintenance.js';
-import { fixture, connector, alpha } from '../../support/sr2-fixture.mjs';
+} from "../../../backend/sr2/participant-security.js";
+import { extendSr2Maintenance } from "../../../backend/sr2/maintenance.js";
+import { fixture, connector, alpha } from "../../support/sr2-fixture.mjs";
 const clock = 1800748800000;
 function token(overrides = {}, headerOverrides = {}) {
   const pair = crypto.generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
