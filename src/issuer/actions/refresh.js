@@ -8,8 +8,8 @@
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-import { createPciIssuerState } from '../workspace-state.js';
 /** Refresh operations with explicit state and I/O dependencies. */
+import { createPciIssuerState } from "../workspace-state.js";
 export function createPciRefreshActions(state, dependencies) {
   const {
     cap,

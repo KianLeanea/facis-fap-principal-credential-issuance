@@ -7,10 +7,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {spawnSync} from 'node:child_process';
-
-test('current-commit patch verification rejects downgrade, edited source and changed patch without upstream mutations',()=>{
- const script=String.raw`
+import { spawnSync } from 'node:child_process';
+test('current-commit patch verification rejects downgrade, edited source and changed patch without upstream mutations', () => {
+  const script = String.raw `
 import hashlib,json,subprocess,sys,tempfile
 from pathlib import Path
 sys.path.insert(0,'tools')
@@ -35,6 +34,7 @@ with tempfile.TemporaryDirectory() as d:
  patch.write_text(patch.read_text()+'changed');rejected(row)
  print(json.dumps({'status':'PASS','upstreamMutations':False}))
 `;
- const r=spawnSync('python3',['-B','-c',script],{encoding:'utf8'});
- assert.equal(r.status,0,r.stderr);assert.equal(JSON.parse(r.stdout).status,'PASS');
+  const r = spawnSync('python3', ['-B', '-c', script], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(JSON.parse(r.stdout).status, 'PASS');
 });
