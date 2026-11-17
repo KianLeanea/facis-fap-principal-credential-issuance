@@ -1,6 +1,8 @@
-/** Run one UI operation: progress flag, notice reset and error normalisation. */
+/** Keep UI progress accurate across overlapping operations and nested refreshes. */
 export function createPciOperationRunner(state, normalizeError, recoverInput) {
+  let pending = 0;
   return async function run(operation) {
+    pending += 1;
     state.busy.value = true;
     state.notice.value = '';
     try {
@@ -15,7 +17,8 @@ export function createPciOperationRunner(state, normalizeError, recoverInput) {
         }
       }
     } finally {
-      state.busy.value = false;
+      pending -= 1;
+      state.busy.value = pending > 0;
     }
   };
 }

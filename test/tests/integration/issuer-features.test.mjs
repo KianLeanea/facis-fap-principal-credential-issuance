@@ -1,7 +1,7 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import { issuerControllerFixture } from '../../support/issuer-controller.mjs';
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { issuerControllerFixture, deferred } from "../../support/issuer-controller.mjs";
 const requestId = 'd616ebf2-2874-426c-83f1-2f9aa0be45ee';
 test('issuer features import independently without Vue or browser globals', () => {
   const { ui } = issuerControllerFixture();
@@ -39,6 +39,10 @@ test('connector editing distinguishes absent scope, empty scope and explicit all
   assert.deepEqual(ui.connectorForm.value.configurationIds, []);
   ui.editConnector({ id: 'two', draft: { name: 'All', configurationIds: null } });
   assert.equal(ui.connectorForm.value.configurationIds, null);
+  const original = { id: 'three', draft: { configurationIds: ['A'] } };
+  ui.editConnector(original);
+  ui.connectorForm.value.configurationIds.push('B');
+  assert.deepEqual(original.draft.configurationIds, ['A']);
 });
 test('flow actions enforce reordering bounds and add steps before the offer', () => {
   const { ui } = issuerControllerFixture();
@@ -97,6 +101,41 @@ test('workspace persistence keeps only opaque request IDs and the active tab', (
   ui.offer.value = { offerUrl: 'https://wallet.example/offer' };
   ui.navigate('request');
   assert.deepEqual(JSON.parse([...saved.values()][0]), { tab: 'request', requestId });
+});
+test('overlapping issuer operations keep busy until the final operation settles', async() => {
+  const first = deferred(),
+  second = deferred();
+  let sequence = 0;
+  const { ui } = issuerControllerFixture({ request: () => (++ sequence === 1 ? first: second).promise });
+  const a = ui.createKey(),
+  b = ui.createKey();
+  assert.equal(ui.busy.value, true);
+  first.resolve({});
+  await a;
+  assert.equal(ui.busy.value, true);
+  second.resolve({});
+  await b;
+  assert.equal(ui.busy.value, false);
+});
+test('wallet return navigation takes priority over a previously saved workspace tab', () => {
+  const saved = new Map([['fap-pci-workspace:alpha:member', JSON.stringify({ tab: 'configurations', requestId: null })]]);
+  const { ui, window } = issuerControllerFixture({ saved, hash: '#/presentation?request=' + requestId + '&response_code=' + 'a'.repeat(
+    43) });
+  assert.equal(ui.tab.value, 'presentation');
+  assert.equal(ui.presentation.value.requestId, requestId);
+  assert.equal(window.location.hash, '#/presentation');
+});
+test('refresh clears privileged workspace state when issuer privileges are removed', async() => {
+  const { ui } = issuerControllerFixture();
+  ui.configs.value = [{ id: 'old-configuration' }];
+  ui.flows.value = [{ id: 'old-flow' }];
+  ui.assets.value = [{ id: 'old-asset' }];
+  ui.assignments.value = [{ id: 'old-assignment' }];
+  ui.members.value = [{ subject: 'old-member' }];
+  ui.identityForm.value.clientSecret = 'synthetic-test-value';
+  await ui.refresh();
+  for (const name of ['configs', 'flows', 'assets', 'assignments', 'members']) assert.deepEqual(ui[name].value, [], name);
+  assert.equal(ui.identityForm.value.clientSecret, '');
 });
 test('successful operations and navigation do not silently dismiss existing errors', async() => {
   const { ui } = issuerControllerFixture();

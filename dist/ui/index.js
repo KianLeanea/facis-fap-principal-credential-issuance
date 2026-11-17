@@ -1460,9 +1460,10 @@ function createPciConnectorActions(state, dependencies) {
   }
   function editConnector(c) {
     connector.value = c;
+    const draft = clone(c.draft);
     connectorForm.value = {
-      ...clone(c.draft),
-      configurationIds: c.draft.configurationIds ?? (Object.hasOwn(c.draft, 'configurationIds') ? null: [])
+      ...draft,
+      configurationIds: Object.hasOwn(draft, 'configurationIds') ? draft.configurationIds: []
     };
   }
   return { saveConnector, newConnector, editConnector };
@@ -1609,7 +1610,7 @@ function createPciJourneyActions(state, dependencies) {
       return null;
     }
   })();
-  if (recovery?.tab) tab.value = recovery.tab;
+  if (recovery?.tab && tab.value !== 'presentation') tab.value = recovery.tab;
   let requestToRestore = /^[a-f0-9-]{36}$/i.test(recovery?.requestId || '') ? recovery.requestId: null;
   function rememberWorkspace() {
     requestToRestore = journey.value?.request?.requestId || null;
@@ -1687,6 +1688,7 @@ function createPciJourneyActions(state, dependencies) {
 
 
 // ---- src/issuer/actions/refresh.js ----
+;
 /** Refresh operations with explicit state and I/O dependencies. */
 function createPciRefreshActions(state, dependencies) {
   const {
@@ -1710,23 +1712,84 @@ function createPciRefreshActions(state, dependencies) {
     settingsForm,
     publication,
     preview,
-    notice,
-    selected,
-    configForm,
-    selectedFlow,
-    flowForm,
-    identity,
-    identityForm,
-    connector
+    notice
   } = state;
-  const { run, call, loadIdentity, api, props, clone, restoreJourney, rememberWorkspace, recovery, sections } = dependencies;
+  const {
+    run,
+    call,
+    loadIdentity,
+    api,
+    props,
+    clone,
+    restoreJourney,
+    rememberWorkspace,
+    recovery,
+    sections,
+    runtime,
+    window
+  } = dependencies;
+  const defaults = createPciIssuerState({ ref: value => ({ value }), props, runtime, window });
+  const issuerFields = [
+    'configs',
+    'flows',
+    'assets',
+    'selected',
+    'configForm',
+    'selectedFlow',
+    'flowForm',
+    'history',
+    'versions',
+    'preview',
+    'query',
+    'configState',
+    'historyConfig',
+    'restoreVersion',
+    'search',
+    'nextCursor'
+  ];
+  const administratorFields = [
+    'members',
+    'assignments',
+    'identity',
+    'identityRedirect',
+    'identityForm',
+    'metadata',
+    'metadataForm',
+    'authServers',
+    'branding',
+    'brandingForm',
+    'settings',
+    'settingsForm',
+    'publication',
+    'connector',
+    'connectorForm',
+    'grant',
+    'grantConfig',
+    'keyName',
+    'keyType',
+    'settingsTab'
+  ];
+  function resetFields(names) {
+    for (const name of names) state[name].value = clone(defaults[name].value);
+  }
+  function clearRevokedPrivileges() {
+    if (!cap.value.issuer) resetFields(issuerFields);
+    if (!cap.value.tenantAdmin) resetFields(administratorFields);
+    if (!cap.value.issuer && !cap.value.tenantAdmin) {
+      resetFields(['uploadRole', 'uploadScope']);
+    }
+  }
   async function refresh() {
     await run(async() => {
       cap.value = await call('/issuer-capabilities');
+      clearRevokedPrivileges();
       if (!loaded.value) {
-        if (tab.value !== 'presentation' && !recovery?.tab) tab.value = cap.value.issuer ? 'configurations': 'request';
+        if (tab.value !== 'presentation' && !recovery?.tab) {
+          tab.value = cap.value.issuer ? 'configurations': 'request';
+        }
         loaded.value = true;
-      } if (!sections.value.some(s => s.id === tab.value)) tab.value = 'request';
+      }
+      if (!sections.value.some(section => section.id === tab.value)) tab.value = 'request';
       connectors.value = cap.value.connectors || [];
       eligible.value = (await call('/eligible-configurations')).items;
       presentationConfigurations.value = (await call('/presentation-configurations')).items;
@@ -1773,9 +1836,11 @@ function createPciRefreshActions(state, dependencies) {
 
 
 // ---- src/issuer/operation-runner.js ----
-/** Run one UI operation: progress flag, notice reset and error normalisation. */
+/** Keep UI progress accurate across overlapping operations and nested refreshes. */
 function createPciOperationRunner(state, normalizeError, recoverInput) {
+  let pending = 0;
   return async function run(operation) {
+    pending += 1;
     state.busy.value = true;
     state.notice.value = '';
     try {
@@ -1790,7 +1855,8 @@ function createPciOperationRunner(state, normalizeError, recoverInput) {
         }
       }
     } finally {
-      state.busy.value = false;
+      pending -= 1;
+      state.busy.value = pending > 0;
     }
   };
 }
@@ -3097,11 +3163,13 @@ const App = {
     }
     const stopReconnect = onBridgeReconnect(recoverWorkspace);
     onUnmounted(stopReconnect);
+    function handleHashRoute() {
+      hashRoute.value = window.location.hash || "#/register";
+      if (hashRoute.value.startsWith("#/provider") && !isTenantHost.value) void loadProvider();
+    }
+    onUnmounted(() => window.removeEventListener("hashchange", handleHashRoute));
     onMounted(async() => {
-      window.addEventListener("hashchange", () => {
-        hashRoute.value = window.location.hash || "#/register";
-        if (hashRoute.value.startsWith("#/provider") && !isTenantHost.value) void loadProvider();
-      });
+      window.addEventListener("hashchange", handleHashRoute);
       try {
         config.value = await api.registrationConfig();
         applyPublicConfiguration(config.value);
