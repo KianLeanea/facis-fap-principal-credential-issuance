@@ -12,8 +12,8 @@
 // This is not a general ESM bundler. Imports must resolve to names provided by
 // the ordered bundle or to the explicit runtime globals. Unsupported exports
 // fail rather than silently producing an incomplete deployment.
-import { parse } from 'acorn';
-import { Script } from 'node:vm';
+import { parse } from "acorn";
+import { Script } from "node:vm";
 const functionTypes = new Set(['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression',]);
 function rejectModuleOnlySyntax(node, filename, depth = 0) {
   if (!node || typeof node.type !== 'string') return;
