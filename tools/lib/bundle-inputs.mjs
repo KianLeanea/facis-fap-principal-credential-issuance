@@ -1,7 +1,34 @@
+export const PCI_ISSUER_MODULES = [
+  "src/issuer/client.js",
+  "src/issuer/form-defaults.js",
+  "src/issuer/workspace-state.js",
+  "src/issuer/workspace-selectors.js",
+  "src/issuer/actions/identity.js",
+  "src/issuer/actions/configurations.js",
+  "src/issuer/actions/flows.js",
+  "src/issuer/actions/tenant.js",
+  "src/issuer/actions/connectors.js",
+  "src/issuer/actions/access.js",
+  "src/issuer/actions/assets.js",
+  "src/issuer/actions/history.js",
+  "src/issuer/actions/presentation.js",
+  "src/issuer/actions/journey.js",
+  "src/issuer/actions/refresh.js",
+  "src/issuer/operation-runner.js",
+  "src/issuer/controller.js",
+  "src/issuer/views/presentation-panel.js",
+  "src/issuer/views/request-panel.js",
+  "src/issuer/views/configurations-panel.js",
+  "src/issuer/views/journeys-panel.js",
+  "src/issuer/views/history-panel.js",
+  "src/issuer/views/tenant-panel.js",
+  "src/issuer/views/connectors-panel.js",
+  "src/issuer/views/delegation-slot.js",
+  "src/issuer/views/delegation-panel.js",
+  "src/issuer/console-template.js",
+  "src/sr2.js"
+];
 // Explicit dependency order for the flat ORCE and browser bundles.
-// The issuer console is one module in the submitted baseline; work package R2-5
-// replaces this entry with the issuer action and view modules.
-export const PCI_ISSUER_MODULES = ["src/sr2.js"];
 export const PCI_UI_MODULES = [
   "shared/public-url.js",
   "src/config/runtime.js",

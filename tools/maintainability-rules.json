@@ -20,23 +20,6 @@
   },
   "exceptions": [
     {
-      "file": "src/sr2.js",
-      "rules": [
-        "line-length",
-        "statements-per-line"
-      ],
-      "reason": "Issuer console component of the submitted baseline, one highly condensed file with the embedded template; refactored into src/issuer/ modules in work package R2-5, which removes this entry.",
-      "issue": "R2-5"
-    },
-    {
-      "file": "src/components/feedback.js",
-      "rules": [
-        "line-length"
-      ],
-      "reason": "Component templates of the submitted baseline on one line; reformatted with the issuer user interface in R2-5, which removes this entry.",
-      "issue": "R2-5"
-    },
-    {
       "file": "tools/build-requirement-audit.mjs",
       "rules": [
         "line-length"
