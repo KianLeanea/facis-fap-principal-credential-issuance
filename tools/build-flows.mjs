@@ -8,9 +8,9 @@
 //
 // Prepared with AI-assisted tools and reviewed by the author.
 // Assisted-by: AI
-import { inspectBundleGraph, pciNativeRuntimeBindings } from './lib/bundle-graph.mjs';
-import { PCI_SR2_MODULES } from './lib/bundle-inputs.mjs';
-import { stripModuleSyntax, validateFunctionBody } from './lib/module-source.mjs';
+import { inspectBundleGraph, pciNativeRuntimeBindings } from "./lib/bundle-graph.mjs";
+import { PCI_SR2_MODULES } from "./lib/bundle-inputs.mjs";
+import { stripModuleSyntax, validateFunctionBody } from "./lib/module-source.mjs";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
